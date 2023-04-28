@@ -33,8 +33,8 @@ const LoginScreen = () => {
         </Text> */}
       </View>
       <Text style={[styles.caption2, styles.caption2Typo]}>
-        <Text style={styles.dontHaveAn}>Don’t have an account?</Text>
-        <Text style={styles.signUp}> Sign up</Text>
+        {/* <Text style={styles.dontHaveAn}>Don’t have an account?</Text> */}
+        {/* <Text style={styles.signUp}> Sign up</Text> */}
       </Text>
     </SafeAreaView>
   );
@@ -142,6 +142,7 @@ const styles = StyleSheet.create({
   },
   dontHaveAn: {
     color: Color.gray_200,
+    marginTop:20
   },
   signUp: {
     color: Color.textWhiteFFFFFF,

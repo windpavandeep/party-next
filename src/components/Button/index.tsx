@@ -1,16 +1,26 @@
-import {Pressable, StyleSheet, TouchableOpacity, Text} from 'react-native';
+import {
+  Pressable,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  StyleProp,
+  ViewStyle,
+  GestureResponderEvent,
+} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import {Border, Color, FontFamily, FontSize} from '@utils/GlobalStyles';
 
 interface Props {
   text?: string;
+  style?: StyleProp<ViewStyle>;
+  onPress?: (event: GestureResponderEvent) => void;
 }
 
-const GradientButton = ({text}: Props) => {
+const GradientButton = ({text, style, onPress}: Props) => {
   return (
-    <TouchableOpacity style={styles.btnContinue}>
+    <TouchableOpacity onPress={onPress} style={[styles.btnContinue, style]}>
       <LinearGradient
-        style={styles.container}
+        style={[styles.container, style]}
         locations={[0, 0, 1]}
         colors={['#823dd8', '#803dda', '#f80354']}
         useAngle={true}

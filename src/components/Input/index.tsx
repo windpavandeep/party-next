@@ -11,6 +11,9 @@ interface Props {
   secureTextEntry?: boolean;
   inputStyle?: Pick<TextInputProps, 'style'> | any;
   IconSvg?: JSX.Element;
+  multiline?: boolean;
+  numberOfLines?: number;
+  extraItem?: JSX.Element;
 }
 
 interface PickerProps extends Props {}
@@ -22,17 +25,30 @@ const AppInput = ({
   secureTextEntry = false,
   inputStyle,
   IconSvg,
+  extraItem,
+  ...rest
 }: Props) => {
   return (
     <>
       <View style={styles.container}>
         <Text style={styles.caption}>{label}</Text>
+        {extraItem}
         <TextInput
-          style={[styles.groupChild, styles.groupChildLayout, inputStyle]}
+          style={[
+            styles.groupChild,
+            styles.groupChildLayout,
+            inputStyle,
+            {
+              ...(!IconSvg && {
+                paddingLeft: 12,
+              }),
+            },
+          ]}
           placeholder={placeholder}
           keyboardType={keyboardType ? keyboardType : 'default'}
           secureTextEntry={secureTextEntry}
           placeholderTextColor={Color.textWhiteFFFFFF}
+          {...rest}
         />
         <View style={styles.iconContainer}>{IconSvg}</View>
       </View>
@@ -65,6 +81,7 @@ export const InputPicker = ({label, inputStyle}: PickerProps) => {
     </>
   );
 };
+
 const styles = StyleSheet.create({
   arrowIcon: {
     position: 'absolute',
@@ -73,6 +90,7 @@ const styles = StyleSheet.create({
   },
   container: {
     position: 'relative',
+    flex: 1,
   },
   iconContainer: {
     position: 'absolute',

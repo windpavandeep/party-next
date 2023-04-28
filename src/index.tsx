@@ -1,8 +1,13 @@
 import React from 'react';
 import NavigateRouters from './navigation/index';
+import {NavigationContainer} from '@react-navigation/native';
 
 const App = () => {
-  return <NavigateRouters />;
+  return (
+    <NavigationContainer>
+      <NavigateRouters />
+    </NavigationContainer>
+  );
 };
 
 export default App;

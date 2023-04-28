@@ -11,11 +11,10 @@ import PageContainer from '@components/Container';
 import GradientButton from '@components/Button';
 import {CALL, CLUB, GALLERY_EXPORT} from '@assets/icons';
 import AppInput, {InputPicker} from 'src/components/Input';
-import {Picker} from 'react-native-ui-lib';
 
 const CreateClub = () => {
   return (
-    <PageContainer>
+    <PageContainer useSafeArea={false}>
       <>
         <View style={styles.header}>
           <Text style={styles.text}>Create Your Club</Text>
@@ -46,12 +45,42 @@ const CreateClub = () => {
             label="Club Name"
           />
           <View style={styles.divider} />
-          <InputPicker IconSvg={<CLUB />} placeholder="Club Name" label="" />
+          <InputPicker placeholder="Club Name" label="" />
           <View style={styles.divider} />
           <AppInput
             IconSvg={<CALL />}
             placeholder="331-623-8416"
             label="Club Phone Number"
+          />
+          <View style={styles.divider} />
+          <View style={styles.pairContianer}>
+            <View style={styles.pair}>
+              <InputPicker
+                inputStyle={{width: 155}}
+                placeholder="Select State"
+                label="State"
+              />
+            </View>
+            <View style={styles.divider} />
+            <View style={styles.pair}>
+              <InputPicker
+                inputStyle={{width: 155}}
+                placeholder="Select City"
+                label="City"
+              />
+            </View>
+          </View>
+          <AppInput placeholder="Enter Zip Code" label="Zip Code" />
+          <View style={styles.divider} />
+          <AppInput
+            placeholder="Type Something"
+            label="Description"
+            multiline={true}
+            numberOfLines={100}
+            inputStyle={{
+              height: 150,
+              paddingTop: 10,
+            }}
           />
         </View>
 
@@ -64,6 +93,15 @@ const CreateClub = () => {
 };
 
 const styles = StyleSheet.create({
+  pair: {
+    flex: 1,
+  },
+  pairContianer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingLeft: 10,
+  },
   inputContianer: {
     marginTop: 22,
     flexDirection: 'column',
@@ -71,6 +109,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     marginTop: 20,
+    width: 20,
   },
   vuesaxoutlinegalleryExportParent: {
     height: 160,
@@ -89,7 +128,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   header: {
-    marginTop: 84,
+    marginTop: 20,
     height: 67,
     width: 295,
   },

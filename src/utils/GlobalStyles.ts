@@ -23,6 +23,12 @@ export const Color = {
   textWhiteFFFFFF: '#fff',
   crimson: '#e94057',
   dimgray: '#4e4e4e',
+  warning_red: 'rgba(244, 72, 72, 0.06)',
+  warning_red_border: '#f44848',
+  text_gray: '#7B7F91',
+  text_black: '#242424',
+  text_blue: '#1777F2',
+  text_green: '#28B446',
 };
 /* Paddings */
 export const Padding = {
