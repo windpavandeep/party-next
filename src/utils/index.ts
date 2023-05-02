@@ -4,4 +4,8 @@ export type RootStackParamList = {
   CreateClub: {id: number} | undefined;
   Settings: {id: number} | undefined;
   ChangePassword: {id: number} | undefined;
+  Login: {id: number} | undefined;
+  OTP: {id: number} | undefined;
+  SignUp: {id: number} | undefined;
+  PrivateStack: {id: number} | undefined;
 };

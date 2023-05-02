@@ -37,7 +37,7 @@ const Tab = createBottomTabNavigator();
 const TabNavigation = () => {
   return (
     <Tab.Navigator
-      initialRouteName="Login"
+      initialRouteName="Home"
       screenOptions={{
         headerShadowVisible: false,
         tabBarActiveTintColor: Color.textWhiteFFFFFF,
@@ -116,7 +116,7 @@ const NavigateRouters = () => {
   return (
     <>
       <Stack.Navigator
-        initialRouteName="PrivateStack"
+        initialRouteName="Login"
         screenOptions={{
           headerShadowVisible: false,
           headerStyle: {

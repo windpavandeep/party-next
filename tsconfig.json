@@ -16,12 +16,13 @@
     "skipLibCheck": true,                                 /* Skip type checking all .d.ts files. */
     "baseUrl": ".",
     "paths": {
-      "src/*": ["src/*"],
+      "@src/*": ["src/*"],
       "@components/*": ["src/components/*"],
       "@screens/*": ["src/screens/*"],
       "@utils/*": ["src/utils/*"],
       "@assets/*": ["src/assets/*"],
-      "@navigation/*": ["src/navigation/*"]
+      "@navigation/*": ["src/navigation/*"],
+      "@feature/*": ["src/feature/*"]
     }
   },
   "include": ["src/**/*"],

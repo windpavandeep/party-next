@@ -23,6 +23,7 @@ module.exports = {
           '@utils': './src/utils',
           '@assets': './src/assets',
           '@navigation': './src/navigation',
+          '@feature': './src/feature/',
         },
       },
     ],

@@ -3,11 +3,15 @@ import {SafeAreaView, StyleSheet, Text, View} from 'react-native';
 import {FontFamily, FontSize, Border, Color} from '@utils/GlobalStyles';
 import AppInput from '@components/Input';
 import GradientButton from '@components/Button';
+import {useNavigation} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RootStackParamList} from 'src/utils';
 
 const LoginScreen = () => {
+  const {navigate} = useNavigation<StackNavigationProp<RootStackParamList>>();
   return (
     <SafeAreaView style={styles.btnContinueParent}>
-      <GradientButton />
+      <GradientButton text="Login" onPress={() => navigate('PrivateStack')} />
       <View style={[styles.header, styles.headerLayout]}>
         <Text style={styles.login1}>Login</Text>
         <Text style={[styles.loginIntoYour, styles.caption2Typo]}>
@@ -142,7 +146,7 @@ const styles = StyleSheet.create({
   },
   dontHaveAn: {
     color: Color.gray_200,
-    marginTop:20
+    marginTop: 20,
   },
   signUp: {
     color: Color.textWhiteFFFFFF,
