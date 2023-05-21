@@ -20,9 +20,12 @@ import {Formik} from 'formik';
 import {signupFormScheme} from '@src/form-schemas/auth';
 import {SignupPayloadTypes} from '@src/types/auth.types';
 import {addUserAsync, userSignupAsync} from '@src/feature/auth/authApi';
+import {getClubUsersAsync} from '@src/feature/club/clubApi';
 
 const AddUser = () => {
-  const {club} = useAppSelector(({clubSlice}) => clubSlice) as any;
+  const {club, loading: pageLoader} = useAppSelector(
+    ({clubSlice}) => clubSlice,
+  ) as any;
   const {loading} = useAppSelector(({authUser}) => authUser);
   const {navigate} = useNavigation<StackNavigationProp<RootStackParamList>>();
   const dispatch = useAppDispatch();
@@ -41,18 +44,17 @@ const AddUser = () => {
       updated: data.getTime(),
     };
 
-    console.log(' == payload ===> ', payload);
-
     dispatch(addUserAsync(payload)).then(res => {
       const status: any = res.meta.requestStatus;
       if (status === 'fulfilled') {
+        dispatch(getClubUsersAsync(club?.club?.id));
         navigate('Handler');
       }
     });
   };
 
   return (
-    <PageContainer useSafeArea={false}>
+    <PageContainer loading={pageLoader} useSafeArea={false}>
       <>
         <Formik
           initialValues={{

@@ -11,23 +11,30 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '@src/utils';
 import {useAppDispatch, useAppSelector} from '@src/app/hooks';
 import {getClubUsersAsync} from '@src/feature/club/clubApi';
+import {USER_PLACEHOLDER_PNG} from '@src/assets/images';
+import {renderImage} from '@src/utils/helper';
 
 interface ListProps {
-  item: Object;
+  item: Object | any;
 }
 
 const UserListItem = ({item}: ListProps) => {
   return (
     <View style={styles.itemContainer}>
       <Avatar
-        source={{
-          uri: 'https://source.unsplash.com/random/200x200?sig=1',
-        }}
+        source={
+          item?.image
+            ? {
+                uri: renderImage(item?.image),
+              }
+            : USER_PLACEHOLDER_PNG
+        }
         size={50}
       />
+
       <View style={styles.detail}>
-        <Text style={styles.textBold}>Kathryn Murphy</Text>
-        <Text style={styles.textSmall}>kathryn@gmail.com</Text>
+        <Text style={styles.textBold}>{item?.name}</Text>
+        <Text style={styles.textSmall}>{item.email}</Text>
       </View>
       <TouchableOpacity
         hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
@@ -39,7 +46,9 @@ const UserListItem = ({item}: ListProps) => {
 };
 
 const Handler = () => {
-  const {club, users} = useAppSelector(({clubSlice}) => clubSlice) as any;
+  const {club, users, loading} = useAppSelector(
+    ({clubSlice}) => clubSlice,
+  ) as any;
   const {navigate} = useNavigation<StackNavigationProp<RootStackParamList>>();
   const dispatch = useAppDispatch();
   React.useEffect(() => {
@@ -59,11 +68,12 @@ const Handler = () => {
     );
   };
 
-  console.log(' === users === > ', users);
-
   return (
     <>
-      <PageContainer extraItems={<FloatActionButton />} useSafeArea={false}>
+      <PageContainer
+        loading={loading}
+        extraItems={<FloatActionButton />}
+        useSafeArea={false}>
         <>
           <View style={styles.listView}>
             {(users?.users ?? []).map((i: any, index: any) => (

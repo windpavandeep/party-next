@@ -1,6 +1,11 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import Toast from 'react-native-toast-message';
-import {addUserAsync, userLoginAsync, userSignupAsync} from './authApi';
+import {
+  addUserAsync,
+  updateUserAsync,
+  userLoginAsync,
+  userSignupAsync,
+} from './authApi';
 export interface UserState {
   loading: Boolean;
   isAuth: Boolean;
@@ -109,6 +114,38 @@ const authSlice = createSlice({
         };
       })
       .addCase(addUserAsync.rejected, (state, action) => {
+        const errorRes: any = action.payload;
+        Toast.show({
+          type: 'error',
+          text1: errorRes?.message,
+        });
+        return {
+          ...state,
+          loading: false,
+        };
+      })
+      /**
+       * Case is using for update user action Pending / Fullfilled / Rejected
+       */
+      .addCase(updateUserAsync.pending, state => ({
+        ...state,
+        loading: true,
+      }))
+      .addCase(updateUserAsync.fulfilled, (state, action) => {
+        Toast.show({
+          type: 'success',
+          text1: 'User update successfully.',
+        });
+        return {
+          ...state,
+          loading: false,
+          user: {
+            ...state.user,
+            ...action.payload,
+          },
+        };
+      })
+      .addCase(updateUserAsync.rejected, (state, action) => {
         const errorRes: any = action.payload;
         Toast.show({
           type: 'error',

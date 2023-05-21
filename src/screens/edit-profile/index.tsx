@@ -11,62 +11,106 @@ import PageContainer from '@components/Container';
 import GradientButton from '@components/Button';
 import AppInput from '@components/Input';
 import {CALL, MsgIcon, UserIcon} from '@assets/icons';
-import {useAppSelector} from '@src/app/hooks';
+import {useAppDispatch, useAppSelector} from '@src/app/hooks';
 import {useNavigation} from '@react-navigation/native';
-import Toast from 'react-native-toast-message';
+import {updateUserAsync} from '@src/feature/auth/authApi';
+import {Formik} from 'formik';
+import {profileEditScheme} from '@src/form-schemas/auth';
 
 const EditProfile = () => {
   const {user} = useAppSelector(({authUser}) => authUser) as any;
+
   const {goBack} = useNavigation();
-  const onSubmit = () => {
-    Toast.show({
-      type: 'success',
-      text1: 'Profile update successfully.',
+
+  const dispatch = useAppDispatch();
+
+  const onSubmit = (values: any) => {
+    const date = new Date();
+    const userUpdated = {
+      ...user,
+      ...values,
+      updated: date.getTime(),
+    };
+    delete userUpdated.token;
+    dispatch(updateUserAsync(userUpdated)).then(res => {
+      if (res.meta.requestStatus === 'fulfilled') {
+        goBack();
+      }
     });
-    goBack();
   };
   return (
     <PageContainer useSafeArea={false}>
-      <>
-        <View style={styles.inputContianer}>
-          <AppInput
-            IconSvg={<UserIcon />}
-            placeholder="Enter Full Name"
-            label="Full Name"
-            value={user.name}
-          />
-          <View style={styles.divider} />
-          <AppInput
-            IconSvg={<MsgIcon />}
-            placeholder="Email Address"
-            label="Email"
-            value={user.email}
-            extraItem={
-              <TouchableOpacity style={styles.phnVerify}>
-                <Text style={[styles.phnVerifyText, {color: Color.text_green}]}>
-                  Verified
-                </Text>
-              </TouchableOpacity>
-            }
-          />
-          <View style={styles.divider} />
-          <AppInput
-            IconSvg={<CALL />}
-            placeholder="331-623-8416"
-            label="Phone Number"
-            value={user.mobile}
-            extraItem={
-              <TouchableOpacity style={styles.phnVerify}>
-                <Text style={styles.phnVerifyText}>Verify</Text>
-              </TouchableOpacity>
-            }
-          />
-        </View>
+      <Formik
+        initialValues={{
+          name: user.name,
+          email: user.email,
+          mobile: user.mobile,
+        }}
+        validationSchema={profileEditScheme}
+        onSubmit={onSubmit}>
+        {({
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          values,
+          errors,
+          touched,
+        }) => (
+          <>
+            <View style={styles.inputContianer}>
+              <AppInput
+                IconSvg={<UserIcon />}
+                placeholder="Enter Full Name"
+                label="Full Name"
+                onChangeText={handleChange('name')}
+                onBlur={handleBlur('name')}
+                value={values.name}
+                error={errors.name && touched.name ? errors.name : undefined}
+              />
+              <View style={styles.divider} />
+              <AppInput
+                editable={false}
+                IconSvg={<MsgIcon />}
+                placeholder="Email Address"
+                label="Email"
+                onChangeText={handleChange('email')}
+                onBlur={handleBlur('email')}
+                value={values.email}
+                error={errors.email && touched.email ? errors.email : undefined}
+                extraItem={
+                  <TouchableOpacity style={styles.phnVerify}>
+                    <Text
+                      style={[styles.phnVerifyText, {color: Color.text_green}]}>
+                      Verified
+                    </Text>
+                  </TouchableOpacity>
+                }
+              />
+              <View style={styles.divider} />
+              <AppInput
+                IconSvg={<CALL />}
+                placeholder="331-623-8416"
+                label="Phone Number"
+                onChangeText={handleChange('mobile')}
+                onBlur={handleBlur('mobile')}
+                value={values.mobile}
+                error={
+                  errors.mobile && touched.mobile ? errors.mobile : undefined
+                }
+                extraItem={
+                  <TouchableOpacity style={styles.phnVerify}>
+                    <Text style={styles.phnVerifyText}>Verify</Text>
+                  </TouchableOpacity>
+                }
+              />
+            </View>
 
-        <View style={styles.buttonContianer}>
-          <GradientButton onPress={onSubmit} text="Save" />
-        </View>
-      </>
+            <View style={styles.buttonContianer}>
+              <GradientButton onPress={handleSubmit} text="Save" />
+            </View>
+          </>
+        )}
+      </Formik>
     </PageContainer>
   );
 };

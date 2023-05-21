@@ -25,8 +25,9 @@ interface Props {
   onChangeText?: any;
   onBlur?: any;
   value?: any;
-  error?: string;
+  error?: string | any;
   containerStyle?: StyleProp<ViewStyle>;
+  editable?: boolean;
 }
 
 interface PickerProps extends Props {

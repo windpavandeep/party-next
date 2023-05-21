@@ -1,7 +1,7 @@
 import {createAsyncThunk} from '@reduxjs/toolkit';
 import {ACTION_TYPES} from './authType';
 import {LoginPayloadTypes, SignupPayloadTypes} from '@src/types/auth.types';
-import {userLogin, userSignup} from '@src/services/auth.service';
+import {userLogin, userSignup, userUpdate} from '@src/services/auth.service';
 
 /** `
  * Payload @LoginPayloadTypes
@@ -47,6 +47,23 @@ export const addUserAsync = createAsyncThunk(
   async (payload: SignupPayloadTypes, {rejectWithValue}) => {
     try {
       const response = await userSignup(payload);
+      return response.data;
+    } catch (err: any) {
+      if (!err.response) {
+        throw err;
+      }
+      return rejectWithValue(err.response.data);
+    }
+  },
+);
+/** `
+ * Payload @SignupPayloadTypes
+ */
+export const updateUserAsync = createAsyncThunk(
+  ACTION_TYPES.UPDATE_USER,
+  async (payload: SignupPayloadTypes, {rejectWithValue}) => {
+    try {
+      const response = await userUpdate(payload);
       return response.data;
     } catch (err: any) {
       if (!err.response) {

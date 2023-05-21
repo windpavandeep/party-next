@@ -33,10 +33,12 @@ const PageContainer = ({
           },
         ]}>
         <LoaderElement
-          customLoader={
-            <ActivityIndicator size={'large'} color={Color.crimson} />
-          }
-          message="Loading...">
+          {...(loading && {
+            customLoader: (
+              <ActivityIndicator size={'large'} color={Color.crimson} />
+            ),
+            message: 'Loading...',
+          })}>
           <ScrollView
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.ScrollView}>

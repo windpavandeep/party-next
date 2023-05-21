@@ -1,3 +1,4 @@
+import {IMAGE_BASE} from '@src/config';
 import {Platform} from 'react-native';
 
 export const inputHelper = (
@@ -28,4 +29,8 @@ export const createFormData = (name: string, photo: any, body: any = {}) => {
   });
 
   return data;
+};
+
+export const renderImage = (url: string) => {
+  return `${IMAGE_BASE}${url}`;
 };

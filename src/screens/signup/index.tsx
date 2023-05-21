@@ -71,6 +71,7 @@ const SignUp = () => {
                 Signup into your account
               </Text>
             </View>
+
             <View style={styles.inputContianer}>
               <AppInput
                 IconSvg={<UserIcon />}
@@ -140,6 +141,7 @@ const SignUp = () => {
                 By tapping Sign up, you agree to our Terms and Policy
               </Text>
             </View>
+
             <View style={styles.buttonContianer}>
               <GradientButton
                 loading={!!loading}
@@ -147,6 +149,7 @@ const SignUp = () => {
                 text="Sign up"
               />
             </View>
+
             <View style={styles.textContianer}>
               <Text style={[styles.typeTheVerification, {textAlign: 'center'}]}>
                 Already have an account?{' '}

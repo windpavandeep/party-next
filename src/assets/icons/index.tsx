@@ -38,8 +38,10 @@ import SHARE from '@assets/icons/share.svg';
 import CROSS from '@assets/icons/cross.svg';
 import TRASH from '@assets/icons/trash.svg';
 import USERS_RECT from '@assets/icons/user-octagon.svg';
+import USERS_PLACEHOLDER from '@assets/icons/user-placeholder.svg';
 
 export {
+  USERS_PLACEHOLDER,
   USERS_RECT,
   TRASH,
   SHARE,

@@ -16,13 +16,15 @@ import ProfileRating, {ProfileMenuItem} from '@components/profile-rating';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '@utils/index';
-import {useAppSelector} from '@src/app/hooks';
-import {createFormData} from '@src/utils/helper';
+import {useAppDispatch, useAppSelector} from '@src/app/hooks';
+import {createFormData, renderImage} from '@src/utils/helper';
 import {imageChange} from '@src/services/auth.service';
+import {updateUserAsync} from '@src/feature/auth/authApi';
 
 const Profile = () => {
   const [image, setImage] = React.useState<any>(null);
   const {navigate} = useNavigation<StackNavigationProp<RootStackParamList>>();
+  const dispatch = useAppDispatch();
   const {user} = useAppSelector(({authUser}) => authUser) as any;
   const onEditProfile = () => {
     navigate('ProfileEdit');
@@ -34,16 +36,27 @@ const Profile = () => {
         mediaType: 'photo',
         selectionLimit: 1,
       });
+      const data = new Date();
+
       setImage(res);
       const imageRes = await imageChange(
-        createFormData('banner', res?.assets?.[0], {}),
+        createFormData('image', res?.assets?.[0], {}),
+        user?.id,
       );
+      const ext: any = (res?.assets?.[0]?.fileName ?? '').split('.').pop();
+      const imageName = `${user?.id}-profile.${ext}`;
+
+      const userUpdated = {
+        ...user,
+        image: imageName,
+        updated: data.getTime(),
+      };
+      delete userUpdated.token;
+      dispatch(updateUserAsync(userUpdated));
     } catch (error) {
       console.log(' == error ===> ', error);
     }
   };
-
-  console.log(' ==== res ===> ', user);
 
   return (
     <>
@@ -56,11 +69,9 @@ const Profile = () => {
                   source={{
                     uri:
                       image?.assets?.[0]?.uri ||
+                      renderImage(user?.image) ||
                       'https://source.unsplash.com/random/200x200?sig=1',
                   }}
-                  // source={{
-                  //   uri: 'https://source.unsplash.com/random/200x200?sig=1',
-                  // }}
                   size={100}
                 />
                 <TouchableOpacity
