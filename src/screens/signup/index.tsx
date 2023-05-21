@@ -11,65 +11,155 @@ import PageContainer from '@components/Container';
 import GradientButton from '@components/Button';
 import AppInput from '@components/Input';
 import {CALL, LOCK, MsgIcon, UserIcon} from '@assets/icons';
+import {useNavigation} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RootStackParamList} from '@src/utils';
+import {Formik} from 'formik';
+import {signupFormScheme} from '@src/form-schemas/auth';
+import {useAppDispatch, useAppSelector} from '@src/app/hooks';
+import {userSignupAsync} from '@src/feature/auth/authApi';
+import {SignupPayloadTypes} from '@src/types/auth.types';
 
 const SignUp = () => {
+  const {navigate} = useNavigation<StackNavigationProp<RootStackParamList>>();
+  const dispatch = useAppDispatch();
+  const {loading} = useAppSelector(({authUser}) => authUser);
+  const onFormSubmit = (values: any) => {
+    const data = new Date();
+    const payload: SignupPayloadTypes = {
+      name: values.name,
+      username: values.email,
+      email: values.email,
+      mobile: values.mobile,
+      country_code: '91',
+      password: values.password,
+      role: 'owner',
+      created: data.getTime(),
+      updated: data.getTime(),
+    };
+    dispatch(userSignupAsync(payload)).then(res => {
+      const status: any = res.meta.requestStatus;
+      if (status === 'fulfilled') {
+        navigate('CreateClub');
+      }
+    });
+  };
   return (
     <PageContainer>
-      <>
-        <View style={styles.header}>
-          <Text style={styles.text}>Signup</Text>
-          <Text style={styles.typeTheVerification}>
-            Signup into your account
-          </Text>
-        </View>
-        <View style={styles.inputContianer}>
-          <AppInput
-            IconSvg={<UserIcon />}
-            placeholder="Enter Full Name"
-            label="Full Name"
-          />
-          <View style={styles.divider} />
-          <AppInput
-            IconSvg={<MsgIcon />}
-            placeholder="Email Address"
-            label="Email"
-          />
-          <View style={styles.divider} />
-          <AppInput
-            IconSvg={<CALL />}
-            placeholder="331-623-8416"
-            label="Phone Number"
-          />
-          <View style={styles.divider} />
-          <AppInput
-            IconSvg={<LOCK />}
-            placeholder="Enter Password"
-            label="Create Password"
-            secureTextEntry
-          />
-          <View style={styles.divider} />
-          <AppInput
-            IconSvg={<LOCK />}
-            placeholder="Enter Password"
-            label="Confirm Password"
-            secureTextEntry
-          />
-        </View>
+      <Formik
+        initialValues={{
+          name: '',
+          email: '',
+          mobile: '',
+          password: '',
+          confirm_password: '',
+        }}
+        validationSchema={signupFormScheme}
+        onSubmit={onFormSubmit}>
+        {({
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          values,
+          errors,
+          touched,
+        }) => (
+          <>
+            <View style={styles.header}>
+              <Text style={styles.text}>Signup</Text>
+              <Text style={styles.typeTheVerification}>
+                Signup into your account
+              </Text>
+            </View>
+            <View style={styles.inputContianer}>
+              <AppInput
+                IconSvg={<UserIcon />}
+                placeholder="Enter Full Name"
+                label="Full Name"
+                onChangeText={handleChange('name')}
+                onBlur={handleBlur('name')}
+                value={values.name}
+                error={errors.name && touched.name ? errors.name : undefined}
+              />
+              <View style={styles.divider} />
+              <AppInput
+                IconSvg={<MsgIcon />}
+                placeholder="Email Address"
+                label="Email"
+                onChangeText={handleChange('email')}
+                onBlur={handleBlur('email')}
+                value={values.email}
+                error={errors.email && touched.email ? errors.email : undefined}
+              />
+              <View style={styles.divider} />
+              <AppInput
+                IconSvg={<CALL />}
+                placeholder="331-623-8416"
+                label="Phone Number"
+                onChangeText={handleChange('mobile')}
+                onBlur={handleBlur('mobile')}
+                value={values.mobile}
+                error={
+                  errors.mobile && touched.mobile ? errors.mobile : undefined
+                }
+              />
+              <View style={styles.divider} />
+              <AppInput
+                IconSvg={<LOCK />}
+                placeholder="Enter Password"
+                label="Create Password"
+                secureTextEntry
+                onChangeText={handleChange('password')}
+                onBlur={handleBlur('password')}
+                value={values.password}
+                error={
+                  errors.password && touched.password
+                    ? errors.password
+                    : undefined
+                }
+              />
+              <View style={styles.divider} />
+              <AppInput
+                IconSvg={<LOCK />}
+                placeholder="Enter Password"
+                label="Confirm Password"
+                secureTextEntry
+                onChangeText={handleChange('confirm_password')}
+                onBlur={handleBlur('confirm_password')}
+                value={values.confirm_password}
+                error={
+                  errors.confirm_password && touched.confirm_password
+                    ? errors.confirm_password
+                    : undefined
+                }
+              />
+            </View>
 
-        <View style={styles.textContianer}>
-          <Text style={styles.bottomText}>
-            By tapping Sign up, you agree to our Terms and Policy
-          </Text>
-        </View>
-        <View style={styles.buttonContianer}>
-          <GradientButton />
-        </View>
-        <View style={styles.textContianer}>
-          <Text style={[styles.typeTheVerification, {textAlign: 'center'}]}>
-            Already have an account? Log In
-          </Text>
-        </View>
-      </>
+            <View style={styles.textContianer}>
+              <Text style={styles.bottomText}>
+                By tapping Sign up, you agree to our Terms and Policy
+              </Text>
+            </View>
+            <View style={styles.buttonContianer}>
+              <GradientButton
+                loading={!!loading}
+                onPress={handleSubmit}
+                text="Sign up"
+              />
+            </View>
+            <View style={styles.textContianer}>
+              <Text style={[styles.typeTheVerification, {textAlign: 'center'}]}>
+                Already have an account?{' '}
+                <Text
+                  onPress={() => navigate('Login')}
+                  style={{color: Color.textWhiteFFFFFF}}>
+                  Log In
+                </Text>
+              </Text>
+            </View>
+          </>
+        )}
+      </Formik>
     </PageContainer>
   );
 };

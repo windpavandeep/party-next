@@ -16,6 +16,7 @@ import {
   REGISTER,
   REHYDRATE,
 } from 'redux-persist';
+import clubSlice from '@src/feature/club/clubSlice';
 
 const persistConfig = {
   key: 'root',
@@ -23,14 +24,9 @@ const persistConfig = {
   storage: AsyncStorage,
 };
 
-// export const store = configureStore({
-//   reducer: {
-//     authSlice: authSlice,
-//   },
-// });
-
 const rootReducer = combineReducers({
   authUser: authSlice,
+  clubSlice: clubSlice,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

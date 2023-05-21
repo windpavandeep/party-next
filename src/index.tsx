@@ -1,10 +1,11 @@
 import React from 'react';
-import {NavigationContainer} from '@react-navigation/native';
+import {Text} from 'react-native';
 import {Provider} from 'react-redux';
-import NavigateRouters from './navigation/index';
+import Toast from 'react-native-toast-message';
+import {NavigationContainer} from '@react-navigation/native';
 import {persistor, store} from '@src/app/store';
 import {PersistGate} from 'redux-persist/integration/react';
-import {Text} from 'react-native';
+import NavigateRouters from './navigation/index';
 
 const App = () => {
   return (
@@ -13,6 +14,7 @@ const App = () => {
         <NavigationContainer>
           <NavigateRouters />
         </NavigationContainer>
+        <Toast />
       </PersistGate>
     </Provider>
   );

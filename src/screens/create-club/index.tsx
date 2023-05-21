@@ -1,18 +1,97 @@
 import * as React from 'react';
-import {StyleSheet, View, Text, TextInput} from 'react-native';
-import {
-  FontSize,
-  FontFamily,
-  Color,
-  Border,
-  MarginTop,
-} from '@utils/GlobalStyles';
+import {StyleSheet, View, Text, TouchableOpacity, Image} from 'react-native';
+import {FontSize, FontFamily, Color, MarginTop} from '@utils/GlobalStyles';
 import PageContainer from '@components/Container';
 import GradientButton from '@components/Button';
-import {CALL, CLUB, GALLERY_EXPORT} from '@assets/icons';
-import AppInput, {InputPicker} from 'src/components/Input';
+import {CALL, CLUB, GALLERY_EXPORT, INPUT_LOCATION} from '@assets/icons';
+import AppInput, {InputPicker} from '@src/components/Input';
+import {clubCreateFormScheme} from '@src/form-schemas/club';
+import {useAppDispatch, useAppSelector} from '@src/app/hooks';
+import {createFormData, inputHelper} from '@src/utils/helper';
+import Pill from '@src/components/pill';
+import * as ImagePicker from 'react-native-image-picker';
+import {Formik} from 'formik';
+import {uploadBanner} from '@src/services/club.service';
+import {createClubAsync} from '@src/feature/club/clubApi';
+import {Button} from 'react-native-ui-lib';
+import {useNavigation} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RootStackParamList} from '@src/utils';
 
 const CreateClub = () => {
+  const [bannerImage, setBannerImage] = React.useState<any>(null);
+  const [tableImage, setTableImage] = React.useState<any>(null);
+  const [amenities, setAmenities] = React.useState<string[]>(['abc']);
+  const [amenitiesText, setAmenitiesText] = React.useState<string>('');
+  const [clubTypes, setClubTypes] = React.useState<string[]>(['']);
+  const {replace} = useNavigation<StackNavigationProp<RootStackParamList>>();
+
+  const {loading, user} = useAppSelector(({clubSlice, authUser}) => ({
+    ...clubSlice,
+    ...authUser,
+  })) as any;
+  const dispatch = useAppDispatch();
+
+  const onAddBanner = async () => {
+    try {
+      const res = await ImagePicker.launchImageLibrary({
+        mediaType: 'photo',
+        selectionLimit: 1,
+      });
+      setBannerImage(res);
+      const imageRes = await uploadBanner(
+        createFormData('banner', res?.assets?.[0], {}),
+      );
+      console.log(' === image res ===> ', imageRes);
+    } catch (error: any) {
+      console.log(' == error ===> ', error, error?.response);
+    }
+  };
+
+  const onAddTableImage = async () => {
+    try {
+      const res = await ImagePicker.launchImageLibrary({
+        mediaType: 'photo',
+        selectionLimit: 1,
+      });
+      setTableImage(res);
+    } catch (error) {
+      console.log(' == error ===> ', error);
+    }
+  };
+
+  const onFormSubmit = (values: any) => {
+    const data = new Date();
+    const payload: any = {
+      banner: values.banner,
+      name: values.name,
+      types: clubTypes.join(),
+      country_code: '91',
+      mobile: values.mobile,
+      location: values.location,
+      latitude: '123.213123',
+      longitute: '12.321321',
+      state: values.state,
+      city: values.city,
+      zipcode: values.zipcode,
+      amenities: amenities.join(),
+      description: values.description,
+      userId: user?.id,
+      created: data.getTime(),
+      updated: data.getTime(),
+    };
+    dispatch(createClubAsync(payload)).then(res => {
+      const status: any = res.meta.requestStatus;
+      if (status === 'fulfilled') {
+        replace('PrivateStack');
+      }
+    });
+  };
+
+  const onRemoveAmenities = (item: string) => {
+    setAmenities(prev => prev.filter(i => i !== item));
+  };
+
   return (
     <PageContainer useSafeArea={false}>
       <>
@@ -23,76 +102,270 @@ const CreateClub = () => {
           </Text>
         </View>
 
-        <View style={styles.vuesaxoutlinegalleryExportParent}>
+        <TouchableOpacity
+          onPress={onAddBanner}
+          style={styles.vuesaxoutlinegalleryExportParent}>
           <GALLERY_EXPORT />
           <Text style={[styles.typeTheVerification, {textAlign: 'center'}]}>
             Upload cove photo
           </Text>
-        </View>
+          {bannerImage && (
+            <Image
+              source={{uri: bannerImage?.assets?.[0].uri}}
+              style={{
+                width: '99.%',
+                height: 158,
+                position: 'absolute',
+                borderRadius: 10,
+              }}
+            />
+          )}
+        </TouchableOpacity>
 
-        <View style={styles.inputContianer}>
-          <AppInput
-            placeholder="image12323.jpeg"
-            label="Upload Tables Blueprint"
-            inputStyle={{
-              paddingLeft: 10,
-            }}
-          />
-          <View style={styles.divider} />
-          <AppInput
-            IconSvg={<CLUB />}
-            placeholder="Club Name"
-            label="Club Name"
-          />
-          <View style={styles.divider} />
-          <InputPicker placeholder="Club Name" label="" />
-          <View style={styles.divider} />
-          <AppInput
-            IconSvg={<CALL />}
-            placeholder="331-623-8416"
-            label="Club Phone Number"
-          />
-          <View style={styles.divider} />
-          <View style={styles.pairContianer}>
-            <View style={styles.pair}>
-              <InputPicker
-                inputStyle={{width: 155}}
-                placeholder="Select State"
-                label="State"
-              />
-            </View>
-            <View style={styles.divider} />
-            <View style={styles.pair}>
-              <InputPicker
-                inputStyle={{width: 155}}
-                placeholder="Select City"
-                label="City"
-              />
-            </View>
-          </View>
-          <AppInput placeholder="Enter Zip Code" label="Zip Code" />
-          <View style={styles.divider} />
-          <AppInput
-            placeholder="Type Something"
-            label="Description"
-            multiline={true}
-            numberOfLines={100}
-            inputStyle={{
-              height: 150,
-              paddingTop: 10,
-            }}
-          />
-        </View>
+        <Formik
+          initialValues={{
+            tableBluerprint: '',
+            name: '',
+            types: '',
+            country_code: '',
+            mobile: '',
+            location: '',
+            latitude: '',
+            longitute: '',
+            state: '',
+            city: '',
+            zipcode: '',
+            amenities: '',
+            description: '',
+            userId: 1,
+            created: '',
+            updated: '',
+          }}
+          // validationSchema={}
+          onSubmit={onFormSubmit}>
+          {({
+            handleChange,
+            handleBlur,
+            handleSubmit,
+            values,
+            errors,
+            touched,
+            setFieldValue,
+          }) => (
+            <>
+              <View style={styles.inputContianer}>
+                <AppInput
+                  placeholder="click on upload"
+                  label="Upload Tables Blueprint"
+                  inputStyle={{
+                    paddingLeft: 10,
+                  }}
+                  {...inputHelper(
+                    'tableBluerprint',
+                    handleChange,
+                    handleBlur,
+                    values,
+                    errors,
+                    touched,
+                  )}
+                  value={tableImage?.assets?.[0]?.fileName}
+                  extraItem={
+                    <>
+                      <TouchableOpacity
+                        style={[styles.addAmen, styles.uploadImage]}
+                        onPress={onAddTableImage}>
+                        <Text style={styles.addAmenText}>Upload</Text>
+                      </TouchableOpacity>
+                    </>
+                  }
+                />
+                <View style={styles.divider} />
+                <AppInput
+                  IconSvg={<CLUB />}
+                  placeholder="Club Name"
+                  label="Club Name"
+                  {...inputHelper(
+                    'name',
+                    handleChange,
+                    handleBlur,
+                    values,
+                    errors,
+                    touched,
+                  )}
+                />
+                <View style={styles.divider} />
+                <InputPicker
+                  label="Type"
+                  placeholder="Club Name"
+                  mode="MULTI"
+                  onChangeText={(res: any) => setClubTypes(res)}
+                  value={clubTypes}
+                />
+                <View style={styles.divider} />
+                <AppInput
+                  IconSvg={<CALL />}
+                  placeholder="331-623-8416"
+                  label="Club Phone Number"
+                  {...inputHelper(
+                    'mobile',
+                    handleChange,
+                    handleBlur,
+                    values,
+                    errors,
+                    touched,
+                  )}
+                />
+                <View style={styles.divider} />
+                <AppInput
+                  IconSvg={<INPUT_LOCATION />}
+                  placeholder="#123, Cal"
+                  label="Location"
+                  {...inputHelper(
+                    'location',
+                    handleChange,
+                    handleBlur,
+                    values,
+                    errors,
+                    touched,
+                  )}
+                />
+                <View style={styles.divider} />
+                <View style={styles.pairContianer}>
+                  <View style={styles.pair}>
+                    <AppInput
+                      inputStyle={{width: 155}}
+                      placeholder="State"
+                      label="State"
+                      {...inputHelper(
+                        'state',
+                        handleChange,
+                        handleBlur,
+                        values,
+                        errors,
+                        touched,
+                      )}
+                    />
+                  </View>
+                  <View style={styles.divider} />
+                  <View style={styles.pair}>
+                    <AppInput
+                      inputStyle={{width: 150}}
+                      placeholder="City"
+                      label="City"
+                      {...inputHelper(
+                        'city',
+                        handleChange,
+                        handleBlur,
+                        values,
+                        errors,
+                        touched,
+                      )}
+                    />
+                  </View>
+                </View>
+                <View style={styles.divider} />
+                <AppInput
+                  placeholder="Enter Zip Code"
+                  label="Zip Code"
+                  {...inputHelper(
+                    'zipcode',
+                    handleChange,
+                    handleBlur,
+                    values,
+                    errors,
+                    touched,
+                  )}
+                />
+                <View style={styles.divider} />
 
-        <View style={styles.buttonContianer}>
-          <GradientButton text="Create Club" />
-        </View>
+                <AppInput
+                  placeholder="type and add"
+                  label="Amenities"
+                  value={amenitiesText}
+                  onChangeText={(text: any) => setAmenitiesText(text)}
+                  extraItem={
+                    <>
+                      <View style={styles.addedAmen}>
+                        {amenities.map((i: string) => (
+                          <Pill text={i} onPress={onRemoveAmenities} />
+                        ))}
+                      </View>
+                      <Button
+                        style={styles.addAmen}
+                        onPress={() => {
+                          setAmenities(
+                            prev =>
+                              [...(prev ?? []), amenitiesText] as string[],
+                          );
+                          setAmenitiesText('');
+                          setFieldValue('amenities', amenities.join());
+                        }}>
+                        <Text style={styles.addAmenText}>Add</Text>
+                      </Button>
+                    </>
+                  }
+                />
+                <View style={styles.divider} />
+                <AppInput
+                  placeholder="Type Something"
+                  label="Description"
+                  multiline={true}
+                  numberOfLines={100}
+                  inputStyle={{
+                    height: 150,
+                    paddingTop: 10,
+                  }}
+                  {...inputHelper(
+                    'description',
+                    handleChange,
+                    handleBlur,
+                    values,
+                    errors,
+                    touched,
+                  )}
+                />
+              </View>
+
+              <View style={styles.buttonContianer}>
+                <GradientButton
+                  text="Create Club"
+                  loading={!!loading}
+                  onPress={handleSubmit}
+                />
+              </View>
+            </>
+          )}
+        </Formik>
       </>
     </PageContainer>
   );
 };
 
 const styles = StyleSheet.create({
+  uploadImage: {
+    top: 32,
+    width: 70,
+  },
+  addedAmen: {
+    flexDirection: 'row',
+    marginTop: 8,
+    height: 30,
+  },
+  addAmen: {
+    width: 50,
+    height: 38,
+    position: 'absolute',
+    right: 6,
+    top: 69,
+    borderRadius: 8,
+    backgroundColor: Color.crimson,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 99,
+  },
+  addAmenText: {
+    color: Color.textWhiteFFFFFF,
+  },
   pair: {
     flex: 1,
   },
@@ -100,7 +373,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingLeft: 10,
+    paddingLeft: 15,
   },
   inputContianer: {
     marginTop: 22,
@@ -121,6 +394,8 @@ const styles = StyleSheet.create({
     marginTop: 35,
     justifyContent: 'center',
     alignItems: 'center',
+    overflow: 'hidden',
+    zIndex: 99,
   },
   buttonContianer: {
     marginTop: 50,

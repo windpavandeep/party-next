@@ -5,41 +5,75 @@ import AppInput from '@components/Input';
 import GradientButton from '@components/Button';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {RootStackParamList} from 'src/utils';
+import {RootStackParamList} from '@src/utils';
+import {useAppDispatch, useAppSelector} from '@src/app/hooks';
+import {userLoginAsync} from '@src/feature/auth/authApi';
+import {Formik} from 'formik';
 
 const LoginScreen = () => {
-  const {navigate} = useNavigation<StackNavigationProp<RootStackParamList>>();
+  const {navigate, replace} =
+    useNavigation<StackNavigationProp<RootStackParamList>>();
+  const {loading} = useAppSelector(({authUser}) => authUser);
+  const dispatch = useAppDispatch();
+  const onSubmit = (values: {username: string; password: string}) => {
+    dispatch(
+      userLoginAsync({
+        username: values.username,
+        password: values.password,
+      }),
+    ).then(res => {
+      const status: any = res.meta.requestStatus;
+      if (status === 'fulfilled') {
+        replace('PrivateStack');
+      }
+    });
+  };
   return (
     <SafeAreaView style={styles.btnContinueParent}>
-      <GradientButton text="Login" onPress={() => navigate('PrivateStack')} />
-      <View style={[styles.header, styles.headerLayout]}>
-        <Text style={styles.login1}>Login</Text>
-        <Text style={[styles.loginIntoYour, styles.caption2Typo]}>
-          Login into your account
-        </Text>
-      </View>
-      <View style={[styles.captionParent, styles.captionLayout]}>
-        <AppInput label="Password" />
-        <Text style={[styles.placeholder1, styles.placeholderPosition]}>
-          Get OTP
-        </Text>
-        {/* <Image
-          style={[styles.vuesaxoutlinelockIcon, styles.iconLayout]}
-          resizeMode="cover"
-          source={require('../assets/vuesaxoutlinelock.png')}
-        /> */}
-      </View>
-      <View style={[styles.captionGroup, styles.captionLayout]}>
-        <AppInput label="Email of Phone" />
-        {/*        
-        <Text style={[styles.placeholder, styles.placeholderPosition]}>
-          Enter Email or Phone
-        </Text> */}
-      </View>
-      <Text style={[styles.caption2, styles.caption2Typo]}>
-        {/* <Text style={styles.dontHaveAn}>Don’t have an account?</Text> */}
-        {/* <Text style={styles.signUp}> Sign up</Text> */}
-      </Text>
+      <Formik initialValues={{username: '', password: ''}} onSubmit={onSubmit}>
+        {({handleChange, handleBlur, handleSubmit, values}) => (
+          <>
+            <GradientButton
+              loading={!!loading}
+              text="Login"
+              onPress={handleSubmit}
+            />
+            <View style={[styles.header, styles.headerLayout]}>
+              <Text style={styles.login1}>Login</Text>
+              <Text style={[styles.loginIntoYour, styles.caption2Typo]}>
+                Login into your account
+              </Text>
+            </View>
+            <View style={[styles.captionParent, styles.captionLayout]}>
+              <AppInput
+                label="Password"
+                onChangeText={handleChange('password')}
+                onBlur={handleBlur('password')}
+                value={values.password}
+                secureTextEntry
+              />
+              <Text style={[styles.placeholder1, styles.placeholderPosition]}>
+                Get OTP
+              </Text>
+            </View>
+            <View style={[styles.captionGroup, styles.captionLayout]}>
+              <AppInput
+                label="Email of Phone"
+                onChangeText={handleChange('username')}
+                onBlur={handleBlur('username')}
+                value={values.username}
+              />
+            </View>
+            <Text style={{marginTop: 10}}>
+              <Text style={styles.dontHaveAn}>Don’t have an account?</Text>
+              <Text onPress={() => navigate('SignUp')} style={styles.signUp}>
+                {' '}
+                Sign up
+              </Text>
+            </Text>
+          </>
+        )}
+      </Formik>
     </SafeAreaView>
   );
 };
@@ -68,7 +102,7 @@ const styles = StyleSheet.create({
   placeholderPosition: {
     lineHeight: 16,
     top: '50%',
-    marginTop: 3,
+    marginTop: 8,
     fontSize: FontSize.size_xs,
     position: 'absolute',
   },

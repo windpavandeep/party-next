@@ -1,7 +1,8 @@
-import React from 'react';
-import {ScrollView, StyleSheet, View} from 'react-native';
+import React, {Fragment} from 'react';
+import {ActivityIndicator, ScrollView, StyleSheet, View} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Color} from '@utils/GlobalStyles';
+import {LoaderScreen} from 'react-native-ui-lib';
 
 const PADDING = 12;
 
@@ -9,28 +10,42 @@ interface Props {
   children: JSX.Element;
   useSafeArea?: boolean;
   disablePadding?: boolean;
+  loading?: boolean;
+  extraItems?: JSX.Element | any;
 }
 
 const PageContainer = ({
   children,
   disablePadding = false,
   useSafeArea = true,
+  loading = false,
+  extraItems,
 }: Props) => {
   const Element = useSafeArea ? SafeAreaView : View;
+  const LoaderElement: any = loading ? LoaderScreen : Fragment;
   return (
-    <Element
-      style={[
-        styles.container,
-        {
-          padding: disablePadding ? 0 : PADDING,
-        },
-      ]}>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.ScrollView}>
-        {children}
-      </ScrollView>
-    </Element>
+    <>
+      <Element
+        style={[
+          styles.container,
+          {
+            padding: disablePadding ? 0 : PADDING,
+          },
+        ]}>
+        <LoaderElement
+          customLoader={
+            <ActivityIndicator size={'large'} color={Color.crimson} />
+          }
+          message="Loading...">
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={styles.ScrollView}>
+            {children}
+          </ScrollView>
+        </LoaderElement>
+        {extraItems && extraItems}
+      </Element>
+    </>
   );
 };
 

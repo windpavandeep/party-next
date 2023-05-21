@@ -26,6 +26,7 @@
 		83FA3C43D26342C38EAF1660 /* Poppins-Italic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4FD5CC4D6AE94A4ABBCEED79 /* Poppins-Italic.ttf */; };
 		913AD44EECB94CF983139BB5 /* Poppins-MediumItalic.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 601C817A8C5E4E608B72B080 /* Poppins-MediumItalic.ttf */; };
 		967EB3B82ACA4C30A3FC52F0 /* Poppins-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4CAD3ACC1E8842928BD5E3B2 /* Poppins-Light.ttf */; };
+		B2705DF02A0A263600082C3B /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = B2705DEF2A0A263600082C3B /* main.jsbundle */; };
 		B6A41557738742C8ABC3738B /* Poppins-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2EC22BE96D894796810D2838 /* Poppins-ExtraLight.ttf */; };
 		C9017A969E7A4687B61E7594 /* Poppins-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B307A58AA0C84E138F789E1A /* Poppins-Black.ttf */; };
 		E0BF4CA10D3544F2A9D2AA29 /* Poppins-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 02AA9A2527354505A84A7C7D /* Poppins-Regular.ttf */; };
@@ -74,6 +75,7 @@
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = owner/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-owner-ownerTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-owner-ownerTests.release.xcconfig"; path = "Target Support Files/Pods-owner-ownerTests/Pods-owner-ownerTests.release.xcconfig"; sourceTree = "<group>"; };
 		A81DE6D8DBA14BCA8A38E22A /* Poppins-BlackItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-BlackItalic.ttf"; path = "../src/assets/fonts/Poppins-BlackItalic.ttf"; sourceTree = "<group>"; };
+		B2705DEF2A0A263600082C3B /* main.jsbundle */ = {isa = PBXFileReference; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
 		B307A58AA0C84E138F789E1A /* Poppins-Black.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Black.ttf"; path = "../src/assets/fonts/Poppins-Black.ttf"; sourceTree = "<group>"; };
 		B99DC215D4AC43DCB1F7864F /* Poppins-BoldItalic.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-BoldItalic.ttf"; path = "../src/assets/fonts/Poppins-BoldItalic.ttf"; sourceTree = "<group>"; };
 		C893C56D447B451BAF4B1BCD /* Poppins-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-SemiBold.ttf"; path = "../src/assets/fonts/Poppins-SemiBold.ttf"; sourceTree = "<group>"; };
@@ -152,6 +154,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				B2705DEF2A0A263600082C3B /* main.jsbundle */,
 				13B07FAE1A68108700A75B9A /* owner */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* ownerTests */,
@@ -304,6 +307,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B2705DF02A0A263600082C3B /* main.jsbundle in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				C9017A969E7A4687B61E7594 /* Poppins-Black.ttf in Resources */,
@@ -565,8 +569,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = XQR9TK7HLT;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = XQR9TK7HLT;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = owner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -580,6 +586,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = app.party.owner;
 				PRODUCT_NAME = owner;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "partymania-owner-8-may-3";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -592,8 +600,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = XQR9TK7HLT;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = XQR9TK7HLT;
 				INFOPLIST_FILE = owner/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -606,6 +616,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = app.party.owner;
 				PRODUCT_NAME = owner;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "partymania-owner-8-may-3";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};

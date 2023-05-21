@@ -20,6 +20,7 @@ import PROFILE_ACTIVE from '@assets/icons/profile-active.svg';
 import NOTIFICATION from '@assets/icons/notification.svg';
 import DANGER from '@assets/icons/danger.svg';
 import LOCATION from '@assets/icons/location_on.svg';
+import INPUT_LOCATION from '@assets/icons/input-location.svg';
 import CAMERA from '@assets/icons/camera.svg';
 import BLANKSTAR from '@assets/icons/blank_star.svg';
 import FILLSTAR from '@assets/icons/fill_star.svg';
@@ -34,8 +35,13 @@ import CALENDOR from '@assets/icons/calendor.svg';
 import ROUNDER_LOCATION from '@assets/icons/rounder-location.svg';
 import COUPLE from '@assets/icons/couple.svg';
 import SHARE from '@assets/icons/share.svg';
+import CROSS from '@assets/icons/cross.svg';
+import TRASH from '@assets/icons/trash.svg';
+import USERS_RECT from '@assets/icons/user-octagon.svg';
 
 export {
+  USERS_RECT,
+  TRASH,
   SHARE,
   COUPLE,
   ROUNDER_LOCATION,
@@ -72,4 +78,6 @@ export {
   ARROW_LEFT,
   BARCODE_ACTIVE,
   PROFILE_ACTIVE,
+  INPUT_LOCATION,
+  CROSS,
 };

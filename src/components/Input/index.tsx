@@ -1,11 +1,19 @@
-import {StyleSheet, Text, TextInput, TextInputProps, View} from 'react-native';
+import {
+  StyleProp,
+  StyleSheet,
+  Text,
+  TextInput,
+  TextInputProps,
+  View,
+  ViewStyle,
+} from 'react-native';
 import {FontFamily, FontSize, Color, Border} from '@utils/GlobalStyles';
 import {KeyboardTypeOptions} from 'react-native';
 import {Picker} from 'react-native-ui-lib';
 import {ARROW_DOWN} from '@assets/icons';
 
 interface Props {
-  label: string;
+  label?: string;
   placeholder?: string;
   keyboardType?: KeyboardTypeOptions;
   secureTextEntry?: boolean;
@@ -14,9 +22,16 @@ interface Props {
   multiline?: boolean;
   numberOfLines?: number;
   extraItem?: JSX.Element;
+  onChangeText?: any;
+  onBlur?: any;
+  value?: any;
+  error?: string;
+  containerStyle?: StyleProp<ViewStyle>;
 }
 
-interface PickerProps extends Props {}
+interface PickerProps extends Props {
+  mode?: string;
+}
 
 const AppInput = ({
   label,
@@ -26,11 +41,13 @@ const AppInput = ({
   inputStyle,
   IconSvg,
   extraItem,
+  error,
+  containerStyle,
   ...rest
 }: Props) => {
   return (
     <>
-      <View style={styles.container}>
+      <View style={[styles.container, containerStyle]}>
         <Text style={styles.caption}>{label}</Text>
         {extraItem}
         <TextInput
@@ -42,6 +59,10 @@ const AppInput = ({
               ...(!IconSvg && {
                 paddingLeft: 12,
               }),
+              ...(error && {
+                borderWidth: 1,
+                borderColor: Color.crimson,
+              }),
             },
           ]}
           placeholder={placeholder}
@@ -51,12 +72,19 @@ const AppInput = ({
           {...rest}
         />
         <View style={styles.iconContainer}>{IconSvg}</View>
+        {error && <Text style={styles.errorText}>{error}</Text>}
       </View>
     </>
   );
 };
 
-export const InputPicker = ({label, inputStyle}: PickerProps) => {
+export const InputPicker = ({
+  label,
+  inputStyle,
+  onChangeText,
+  value,
+  ...rest
+}: PickerProps) => {
   return (
     <>
       <View style={styles.container}>
@@ -68,9 +96,10 @@ export const InputPicker = ({label, inputStyle}: PickerProps) => {
             inputStyle,
             {paddingLeft: 12},
           ]}
-          value={'Club'}
+          value={value}
           placeholder={'Placeholder'}
-          onChange={() => console.log('changed')}>
+          onChange={onChangeText}
+          {...rest}>
           <Picker.Item key={0} value={'Club'} label={'Club'} />
           <Picker.Item key={1} value={'Bar'} label={'Bar'} />
         </Picker>
@@ -83,6 +112,16 @@ export const InputPicker = ({label, inputStyle}: PickerProps) => {
 };
 
 const styles = StyleSheet.create({
+  errorText: {
+    marginBottom: 5,
+    marginTop: 5,
+    color: Color.crimson,
+    fontSize: 12,
+    textAlign: 'left',
+    position: 'absolute',
+    bottom: -22,
+    left: 5,
+  },
   arrowIcon: {
     position: 'absolute',
     right: 15,

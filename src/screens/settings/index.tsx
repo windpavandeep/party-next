@@ -7,13 +7,27 @@ import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '@utils/index';
 import ModalAlert from 'src/components/Modal';
+import {useAppDispatch} from '@src/app/hooks';
+import {onLogout} from '@src/feature/auth/authSlice';
 
 const Settings = () => {
-  const {navigate} = useNavigation<StackNavigationProp<RootStackParamList>>();
+  const {navigate, replace} =
+    useNavigation<StackNavigationProp<RootStackParamList>>();
+  const [loading, setLoading] = React.useState(false);
   const [showDeleteModal, setShowDeleteModal] = React.useState(false);
   const [showLogoutModal, setShowLogoutModal] = React.useState(false);
+  const dispatch = useAppDispatch();
+  const onLogOutHandler = () => {
+    setLoading(true);
+    setTimeout(() => {
+      dispatch(onLogout());
+      setShowLogoutModal(false);
+      replace('Login');
+      setLoading(false);
+    }, 1000);
+  };
   return (
-    <PageContainer useSafeArea={false}>
+    <PageContainer loading={loading} useSafeArea={false}>
       <>
         <ModalAlert
           show={showDeleteModal}
@@ -28,6 +42,7 @@ const Settings = () => {
           title="Logout"
           subTitle="Are you sure you want to Logout your account?"
           onClose={() => setShowLogoutModal(false)}
+          onConfirm={onLogOutHandler}
         />
         {[
           {

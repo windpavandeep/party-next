@@ -10,8 +10,18 @@ import {
 import PageContainer from '@components/Container';
 import GradientButton from '@components/Button';
 import AppInput from '@components/Input';
+import Toast from 'react-native-toast-message';
+import {useNavigation} from '@react-navigation/native';
 
 const ChangePassword = () => {
+  const {goBack} = useNavigation();
+  const onSubmit = () => {
+    Toast.show({
+      type: 'success',
+      text1: 'Password has been changed.',
+    });
+    goBack();
+  };
   return (
     <PageContainer useSafeArea={false}>
       <>
@@ -39,7 +49,7 @@ const ChangePassword = () => {
         </View>
 
         <View style={styles.buttonContianer}>
-          <GradientButton text="Change Password" />
+          <GradientButton onPress={onSubmit} text="Change Password" />
         </View>
       </>
     </PageContainer>

@@ -8,4 +8,6 @@ export type RootStackParamList = {
   OTP: {id: number} | undefined;
   SignUp: {id: number} | undefined;
   PrivateStack: {id: number} | undefined;
+  Handler: any | undefined;
+  AddUser: any | undefined;
 };

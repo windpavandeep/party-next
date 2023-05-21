@@ -4,11 +4,27 @@ import {FontSize, FontFamily, Color, Border} from '@utils/GlobalStyles';
 import PageContainer from '@components/Container';
 import {ARROW_RIGHT, DANGER, LOCATION} from '@assets/icons';
 import EventCard, {LongEventCard} from '@components/EventCard';
+import {useAppDispatch, useAppSelector} from '@src/app/hooks';
+import {getClubDetailAsync} from '@src/feature/club/clubApi';
+import {useNavigation} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RootStackParamList} from '@src/utils';
 
 const Home = () => {
+  const {loading} = useAppSelector(({clubSlice}) => clubSlice) as any;
+  const {replace} = useNavigation<StackNavigationProp<RootStackParamList>>();
+  const dispatch = useAppDispatch();
+  React.useEffect(() => {
+    dispatch(getClubDetailAsync(1)).then(res => {
+      if (res.meta.requestStatus === 'fulfilled' && res.payload?.club == null) {
+        replace('CreateClub');
+      }
+    });
+  }, []);
+
   return (
     <>
-      <PageContainer useSafeArea={false}>
+      <PageContainer loading={loading} useSafeArea={false}>
         <>
           <View style={styles.rectangleParent}>
             <View style={styles.groupChild}>

@@ -11,8 +11,20 @@ import PageContainer from '@components/Container';
 import GradientButton from '@components/Button';
 import AppInput from '@components/Input';
 import {CALL, MsgIcon, UserIcon} from '@assets/icons';
+import {useAppSelector} from '@src/app/hooks';
+import {useNavigation} from '@react-navigation/native';
+import Toast from 'react-native-toast-message';
 
 const EditProfile = () => {
+  const {user} = useAppSelector(({authUser}) => authUser) as any;
+  const {goBack} = useNavigation();
+  const onSubmit = () => {
+    Toast.show({
+      type: 'success',
+      text1: 'Profile update successfully.',
+    });
+    goBack();
+  };
   return (
     <PageContainer useSafeArea={false}>
       <>
@@ -21,12 +33,14 @@ const EditProfile = () => {
             IconSvg={<UserIcon />}
             placeholder="Enter Full Name"
             label="Full Name"
+            value={user.name}
           />
           <View style={styles.divider} />
           <AppInput
             IconSvg={<MsgIcon />}
             placeholder="Email Address"
             label="Email"
+            value={user.email}
             extraItem={
               <TouchableOpacity style={styles.phnVerify}>
                 <Text style={[styles.phnVerifyText, {color: Color.text_green}]}>
@@ -40,6 +54,7 @@ const EditProfile = () => {
             IconSvg={<CALL />}
             placeholder="331-623-8416"
             label="Phone Number"
+            value={user.mobile}
             extraItem={
               <TouchableOpacity style={styles.phnVerify}>
                 <Text style={styles.phnVerifyText}>Verify</Text>
@@ -49,7 +64,7 @@ const EditProfile = () => {
         </View>
 
         <View style={styles.buttonContianer}>
-          <GradientButton text="Save" />
+          <GradientButton onPress={onSubmit} text="Save" />
         </View>
       </>
     </PageContainer>

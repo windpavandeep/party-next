@@ -29,6 +29,9 @@ import EventDetails from '@screens/event-detail';
 import EditProfile from '@screens/edit-profile';
 import Settings from '@screens/settings';
 import ChangePassword from '@screens/change-password';
+import {useAppSelector} from '@src/app/hooks';
+import Handler from '@src/screens/handler';
+import AddUser from '@src/screens/add-user';
 
 const Stack = createNativeStackNavigator();
 
@@ -112,7 +115,11 @@ const TabNavigation = () => {
 };
 
 const NavigateRouters = () => {
+  const {isAuth, user} = useAppSelector(({authUser}) => authUser);
   const {goBack} = useNavigation();
+
+  console.log(' === isAuth === ', isAuth, user);
+
   return (
     <>
       <Stack.Navigator
@@ -134,26 +141,37 @@ const NavigateRouters = () => {
             </TouchableOpacity>
           ),
         }}>
+        {!isAuth && (
+          <>
+            <Stack.Screen
+              options={{
+                headerShown: false,
+              }}
+              name="Login"
+              component={LoginScreen}
+            />
+            <Stack.Screen
+              options={{
+                headerShown: false,
+              }}
+              name="OTP"
+              component={OTP}
+            />
+            <Stack.Screen
+              options={{
+                headerShown: false,
+              }}
+              name="SignUp"
+              component={SignUp}
+            />
+          </>
+        )}
         <Stack.Screen
           options={{
             headerShown: false,
           }}
-          name="Login"
-          component={LoginScreen}
-        />
-        <Stack.Screen
-          options={{
-            headerShown: false,
-          }}
-          name="OTP"
-          component={OTP}
-        />
-        <Stack.Screen
-          options={{
-            headerShown: false,
-          }}
-          name="SignUp"
-          component={SignUp}
+          name="PrivateStack"
+          component={TabNavigation}
         />
         <Stack.Screen
           options={{
@@ -190,17 +208,26 @@ const NavigateRouters = () => {
         <Stack.Screen
           options={{
             headerShown: true,
+            title: 'Manage Handler',
+          }}
+          name="Handler"
+          component={Handler}
+        />
+        <Stack.Screen
+          options={{
+            headerShown: true,
+            title: 'Create Handler User',
+          }}
+          name="AddUser"
+          component={AddUser}
+        />
+        <Stack.Screen
+          options={{
+            headerShown: true,
             title: 'Change Password',
           }}
           name="ChangePassword"
           component={ChangePassword}
-        />
-        <Stack.Screen
-          options={{
-            headerShown: false,
-          }}
-          name="PrivateStack"
-          component={TabNavigation}
         />
       </Stack.Navigator>
     </>
