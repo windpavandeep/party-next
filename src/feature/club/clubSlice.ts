@@ -1,6 +1,6 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
 import Toast from 'react-native-toast-message';
-import {createClubAsync, getClubUsersAsync} from './clubApi';
+import {createClubAsync, getClubUsersAsync, updateClubAsync} from './clubApi';
 import {getClubDetailAsync} from './clubApi';
 export interface clubState {
   loading: Boolean;
@@ -35,11 +35,41 @@ const clubSlice = createSlice({
         return {
           ...state,
           loading: false,
-          isAuth: true,
-          user: action?.payload,
         };
       })
       .addCase(createClubAsync.rejected, (state, action) => {
+        const errorRes: any = action.payload;
+        Toast.show({
+          type: 'error',
+          text1: errorRes?.message,
+        });
+        return {
+          ...state,
+          loading: false,
+        };
+      })
+
+      /**
+       * Case is using for update club action Pending / Fullfilled / Rejected
+       */
+      .addCase(updateClubAsync.pending, state => ({
+        ...state,
+        loading: true,
+      }))
+      .addCase(updateClubAsync.fulfilled, (state, action) => {
+        Toast.show({
+          type: 'success',
+          text1: 'Club successfully updated.',
+        });
+        return {
+          ...state,
+          loading: false,
+          club: {
+            club: action.payload,
+          },
+        };
+      })
+      .addCase(updateClubAsync.rejected, (state, action) => {
         const errorRes: any = action.payload;
         Toast.show({
           type: 'error',

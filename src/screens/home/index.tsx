@@ -12,15 +12,18 @@ import {RootStackParamList} from '@src/utils';
 
 const Home = () => {
   const {loading} = useAppSelector(({clubSlice}) => clubSlice) as any;
+  const {user} = useAppSelector(({authUser}) => authUser) as any;
   const {replace} = useNavigation<StackNavigationProp<RootStackParamList>>();
   const dispatch = useAppDispatch();
   React.useEffect(() => {
-    dispatch(getClubDetailAsync(1)).then(res => {
+    dispatch(getClubDetailAsync(user?.id)).then(res => {
       if (res.meta.requestStatus === 'fulfilled' && res.payload?.club == null) {
         replace('CreateClub');
       }
     });
   }, []);
+
+  console.log(' === user ==== id === ', user?.id);
 
   return (
     <>

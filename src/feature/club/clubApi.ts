@@ -4,6 +4,7 @@ import {
   createClub,
   getClubDetail,
   getClubUsers,
+  updateClub,
 } from '@src/services/club.service';
 
 export const createClubAsync = createAsyncThunk(
@@ -20,6 +21,22 @@ export const createClubAsync = createAsyncThunk(
     }
   },
 );
+
+export const updateClubAsync = createAsyncThunk(
+  ACTION_TYPES.UPDATE_CLUB,
+  async (payload: any, {rejectWithValue}) => {
+    try {
+      const response = await updateClub(payload);
+      return response.data;
+    } catch (err: any) {
+      if (!err.response) {
+        throw err;
+      }
+      return rejectWithValue(err.response.data);
+    }
+  },
+);
+
 export const getClubDetailAsync = createAsyncThunk(
   ACTION_TYPES.GET_CLUB_DETAIL,
   async (payload: any, {rejectWithValue}) => {

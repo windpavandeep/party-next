@@ -92,7 +92,7 @@ const Profile = () => {
                 text="Edit Profile Details"
               />
               <ProfileMenuItem
-                onPress={() => navigate('CreateClub')}
+                onPress={() => navigate('CreateClub', {edit: true})}
                 Icon={MENU_CLUB}
                 text="Edit Club Details"
               />
