@@ -1,4 +1,5 @@
 import {
+  ColorValue,
   StyleProp,
   StyleSheet,
   Text,
@@ -9,8 +10,9 @@ import {
 } from 'react-native';
 import {FontFamily, FontSize, Color, Border} from '@utils/GlobalStyles';
 import {KeyboardTypeOptions} from 'react-native';
-import {Picker} from 'react-native-ui-lib';
+import {Picker, DateTimePicker} from 'react-native-ui-lib';
 import {ARROW_DOWN} from '@assets/icons';
+// import DateTimePicker from '@react-native-community/datetimepicker';
 
 interface Props {
   label?: string;
@@ -28,6 +30,7 @@ interface Props {
   error?: string | any;
   containerStyle?: StyleProp<ViewStyle>;
   editable?: boolean;
+  placeholderColor?: ColorValue | any;
 }
 
 interface PickerProps extends Props {
@@ -44,12 +47,13 @@ const AppInput = ({
   extraItem,
   error,
   containerStyle,
+  placeholderColor,
   ...rest
 }: Props) => {
   return (
     <>
       <View style={[styles.container, containerStyle]}>
-        <Text style={styles.caption}>{label}</Text>
+        {label && <Text style={styles.caption}>{label}</Text>}
         {extraItem}
         <TextInput
           style={[
@@ -69,7 +73,9 @@ const AppInput = ({
           placeholder={placeholder}
           keyboardType={keyboardType ? keyboardType : 'default'}
           secureTextEntry={secureTextEntry}
-          placeholderTextColor={Color.textWhiteFFFFFF}
+          placeholderTextColor={
+            placeholderColor ? placeholderColor : Color.textWhiteFFFFFF
+          }
           {...rest}
         />
         <View style={styles.iconContainer}>{IconSvg}</View>
@@ -107,6 +113,70 @@ export const InputPicker = ({
         <View style={styles.arrowIcon}>
           <ARROW_DOWN />
         </View>
+      </View>
+    </>
+  );
+};
+
+export const InputTimePicker = ({
+  label,
+  inputStyle,
+  onChangeText,
+  value,
+  ...rest
+}: PickerProps) => {
+  return (
+    <>
+      <View style={styles.container}>
+        <View style={[styles.groupChild, styles.groupChildLayout, inputStyle]}>
+          <DateTimePicker
+            value={new Date()}
+            mode="time"
+            style={{
+              color: Color.textWhiteFFFFFF,
+            }}
+          />
+        </View>
+      </View>
+    </>
+  );
+};
+
+export const LabelTypo = ({
+  label,
+  fontSize,
+  textStyle,
+}: {
+  label: string;
+  fontSize?: number;
+  textStyle?: any;
+}) => (
+  <Text
+    style={[
+      styles.caption,
+      {...(fontSize && {fontSize: fontSize})},
+      textStyle,
+    ]}>
+    {label}
+  </Text>
+);
+
+export const InputDatePicker = ({
+  label,
+  inputStyle,
+  onChangeText,
+  value,
+  ...rest
+}: PickerProps) => {
+  return (
+    <>
+      <View style={styles.container}>
+        <DateTimePicker
+          style={[styles.groupChild, styles.groupChildLayout, inputStyle]}
+          mode="date"
+          placeholder="Choose a Ticket Purchase Deadline"
+          label={label}
+        />
       </View>
     </>
   );

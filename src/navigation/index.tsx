@@ -32,6 +32,7 @@ import ChangePassword from '@screens/change-password';
 import {useAppSelector} from '@src/app/hooks';
 import Handler from '@src/screens/handler';
 import AddUser from '@src/screens/add-user';
+import CreateEvent from '@src/screens/create-event';
 
 const Stack = createNativeStackNavigator();
 
@@ -180,6 +181,14 @@ const NavigateRouters = () => {
           }}
           name="CreateClub"
           component={CreateClub}
+        />
+        <Stack.Screen
+          options={{
+            headerShown: true,
+            title: 'Create Event',
+          }}
+          name="CreateEvent"
+          component={CreateEvent}
         />
         <Stack.Screen
           options={{

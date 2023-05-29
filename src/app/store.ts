@@ -17,16 +17,19 @@ import {
   REHYDRATE,
 } from 'redux-persist';
 import clubSlice from '@src/feature/club/clubSlice';
+import eventSlice from '@src/feature/events/eventSlice';
 
 const persistConfig = {
   key: 'root',
   version: 1,
   storage: AsyncStorage,
+  blacklist: ['eventSlice'],
 };
 
 const rootReducer = combineReducers({
   authUser: authSlice,
   clubSlice: clubSlice,
+  eventSlice: eventSlice,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

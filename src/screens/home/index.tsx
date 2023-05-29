@@ -44,9 +44,24 @@ const Home = () => {
             </Text>
           </View>
           <View style={styles.listView}>
-            {[1, 2].map(i => (
+            {/* {[1, 2].map(i => (
               <LongEventCard key={i} />
-            ))}
+            ))} */}
+            <View
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: 200,
+              }}>
+              <Text
+                style={{
+                  fontSize: FontSize.size_lg,
+                  color: Color.textWhiteFFFFFF,
+                }}>
+                No ongoing events
+              </Text>
+            </View>
           </View>
 
           <View style={styles.tabContainer}>
@@ -56,13 +71,28 @@ const Home = () => {
             </Text>
           </View>
           <View style={styles.cardEventItemContainer}>
+            <View
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: 200,
+              }}>
+              <Text
+                style={{
+                  fontSize: FontSize.size_lg,
+                  color: Color.textWhiteFFFFFF,
+                }}>
+                No upcoming events
+              </Text>
+            </View>
             <ScrollView horizontal>
-              {[1, 2, 3, 4, 5].map(i => (
+              {/* {[1, 2, 3, 4, 5].map(i => (
                 <React.Fragment key={i}>
                   <EventCard />
                   <View style={styles.divider} />
                 </React.Fragment>
-              ))}
+              ))} */}
             </ScrollView>
           </View>
         </>

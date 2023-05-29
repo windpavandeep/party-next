@@ -39,8 +39,16 @@ import CROSS from '@assets/icons/cross.svg';
 import TRASH from '@assets/icons/trash.svg';
 import USERS_RECT from '@assets/icons/user-octagon.svg';
 import USERS_PLACEHOLDER from '@assets/icons/user-placeholder.svg';
+import PLUS_ADD from '@assets/icons/plus-add.svg';
+import MALE_ICON from '@assets/icons/male.svg';
+import FEMALE_ICON from '@assets/icons/female.svg';
+import COUPLE_ICON from '@assets/icons/couple-type.svg';
 
 export {
+  MALE_ICON,
+  FEMALE_ICON,
+  COUPLE_ICON,
+  PLUS_ADD,
   USERS_PLACEHOLDER,
   USERS_RECT,
   TRASH,

@@ -10,4 +10,5 @@ export type RootStackParamList = {
   PrivateStack: {id: number} | undefined;
   Handler: any | undefined;
   AddUser: any | undefined;
+  CreateEvent: any | undefined;
 };

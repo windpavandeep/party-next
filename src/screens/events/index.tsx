@@ -3,12 +3,30 @@ import {StyleSheet, Text, View} from 'react-native';
 import PageContainer from '@components/Container';
 import {LongEventCard} from '@components/EventCard';
 import {Calendar} from 'react-native-calendars';
-import {Color, FontFamily} from '@utils/GlobalStyles';
+import {Color, FontFamily, FontSize} from '@utils/GlobalStyles';
+import GradientButton from '@src/components/Button';
+import {EVENTS} from '@src/assets/icons';
+import {useNavigation} from '@react-navigation/native';
+import {RootStackParamList} from '@src/utils';
+import {StackNavigationProp} from '@react-navigation/stack';
 
 const Events = () => {
+  const {navigate} = useNavigation<StackNavigationProp<RootStackParamList>>();
+  const FloatActionButton = () => {
+    return (
+      <View style={styles.floatBtn}>
+        <GradientButton
+          icon={<EVENTS />}
+          style={{width: 140}}
+          text="Create Event"
+          onPress={() => navigate('CreateEvent')}
+        />
+      </View>
+    );
+  };
   return (
     <>
-      <PageContainer useSafeArea={false}>
+      <PageContainer extraItems={<FloatActionButton />} useSafeArea={false}>
         <>
           <View style={styles.calContianer}>
             <Calendar
@@ -27,9 +45,24 @@ const Events = () => {
             />
           </View>
           <View style={styles.listView}>
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => (
+            {/* {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => (
               <LongEventCard key={i} />
-            ))}
+            ))} */}
+            <View
+              style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: 200,
+              }}>
+              <Text
+                style={{
+                  fontSize: FontSize.size_lg,
+                  color: Color.textWhiteFFFFFF,
+                }}>
+                No events
+              </Text>
+            </View>
           </View>
         </>
       </PageContainer>
@@ -38,6 +71,12 @@ const Events = () => {
 };
 
 const styles = StyleSheet.create({
+  floatBtn: {
+    position: 'absolute',
+    zIndex: 99,
+    bottom: 10,
+    right: 10,
+  },
   calendor: {
     backgroundColor: Color.gray_300,
   },
