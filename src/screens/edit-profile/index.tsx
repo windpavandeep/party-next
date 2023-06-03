@@ -25,13 +25,13 @@ const EditProfile = () => {
   const dispatch = useAppDispatch();
 
   const onSubmit = (values: any) => {
-    const date = new Date();
     const userUpdated = {
       ...user,
       ...values,
-      updated: date.getTime(),
     };
     delete userUpdated.token;
+    delete userUpdated.created;
+    delete userUpdated.updated;
     dispatch(updateUserAsync(userUpdated)).then(res => {
       if (res.meta.requestStatus === 'fulfilled') {
         goBack();

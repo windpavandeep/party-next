@@ -9,25 +9,42 @@ import {getClubDetailAsync} from '@src/feature/club/clubApi';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '@src/utils';
+import {getUserDetailAsync} from '@src/feature/auth/authApi';
+import {onLogout} from '@src/feature/auth/authSlice';
 
 const Home = () => {
   const {loading} = useAppSelector(({clubSlice}) => clubSlice) as any;
+  const [loader, setLoader] = React.useState<boolean>(false);
   const {user} = useAppSelector(({authUser}) => authUser) as any;
   const {replace} = useNavigation<StackNavigationProp<RootStackParamList>>();
   const dispatch = useAppDispatch();
+
   React.useEffect(() => {
-    dispatch(getClubDetailAsync(user?.id)).then(res => {
+    dispatch(getUserDetailAsync(user?.id)).then(res => {
+      if (res.meta.requestStatus === 'rejected') {
+        setLoader(true);
+        setTimeout(() => {
+          dispatch(onLogout());
+          replace('Login');
+          setLoader(false);
+        }, 1000);
+      }
       if (res.meta.requestStatus === 'fulfilled' && res.payload?.club == null) {
-        replace('CreateClub');
+        dispatch(getClubDetailAsync(user?.id)).then(res => {
+          if (
+            res.meta.requestStatus === 'fulfilled' &&
+            res.payload?.club == null
+          ) {
+            replace('CreateClub');
+          }
+        });
       }
     });
   }, []);
 
-  console.log(' === user ==== id === ', user?.id);
-
   return (
     <>
-      <PageContainer loading={loading} useSafeArea={false}>
+      <PageContainer loading={loader || loading} useSafeArea={false}>
         <>
           <View style={styles.rectangleParent}>
             <View style={styles.groupChild}>

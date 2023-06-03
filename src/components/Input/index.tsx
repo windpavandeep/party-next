@@ -12,6 +12,9 @@ import {FontFamily, FontSize, Color, Border} from '@utils/GlobalStyles';
 import {KeyboardTypeOptions} from 'react-native';
 import {Picker, DateTimePicker} from 'react-native-ui-lib';
 import {ARROW_DOWN} from '@assets/icons';
+import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
+import {useEffect, useRef} from 'react';
+
 // import DateTimePicker from '@react-native-community/datetimepicker';
 
 interface Props {
@@ -31,6 +34,8 @@ interface Props {
   containerStyle?: StyleProp<ViewStyle>;
   editable?: boolean;
   placeholderColor?: ColorValue | any;
+  maxLength?: number;
+  ref?: any;
 }
 
 interface PickerProps extends Props {
@@ -182,6 +187,84 @@ export const InputDatePicker = ({
   );
 };
 
+export const GoogleAutoComplete = ({
+  label,
+  placeholder,
+  keyboardType,
+  secureTextEntry = false,
+  inputStyle,
+  IconSvg,
+  extraItem,
+  error,
+  containerStyle,
+  placeholderColor,
+  onChangeText,
+  value,
+  ...rest
+}: Props) => {
+  const ref = useRef();
+  useEffect(() => {
+    if (value) {
+      const d: any = ref.current;
+      d.setAddressText(value);
+    }
+  }, []);
+  return (
+    <>
+      <View style={[styles.container, containerStyle]}>
+        {label && <Text style={styles.caption}>{label}</Text>}
+        {extraItem}
+        <View style={[styles.iconContainer, {bottom: 19}]}>{IconSvg}</View>
+        <GooglePlacesAutocomplete
+          ref={ref}
+          styles={{
+            container: {
+              flex: 1,
+              width: 335,
+            },
+            textInput: {
+              ...styles.groupChild,
+              ...styles.groupChildLayout,
+              ...inputStyle,
+              ...(!IconSvg && {
+                paddingLeft: 12,
+              }),
+              ...(error && {
+                borderWidth: 1,
+                borderColor: Color.crimson,
+              }),
+            },
+            row: {
+              backgroundColor: Color.text_black,
+            },
+            description: {
+              color: Color.textWhiteFFFFFF,
+            },
+            poweredContainer: {display: 'none'},
+          }}
+          placeholder="Search"
+          onPress={(data, details = null) => {
+            onChangeText(data, details);
+          }}
+          fetchDetails={true}
+          query={{
+            key: 'AIzaSyBokV1RP-r5g0DelpH_Dv9CfpFfjJZ6Fg0',
+            language: 'en',
+          }}
+          nearbyPlacesAPI="GooglePlacesSearch"
+          debounce={200}
+          listViewDisplayed={false}
+          {...rest}
+        />
+
+        {error && <Text style={[styles.errorText,{
+           bottom: -19,
+        }]}>{error}</Text>}
+      </View>
+    </>
+  );
+};
+
 const styles = StyleSheet.create({
   errorText: {
     marginBottom: 5,
@@ -190,7 +273,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
     textAlign: 'left',
     position: 'absolute',
-    bottom: -22,
+    bottom: -24,
     left: 5,
   },
   arrowIcon: {

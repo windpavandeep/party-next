@@ -2,10 +2,12 @@ import * as yup from 'yup';
 
 export const clubCreateFormScheme = yup.object({
   name: yup.string().required('Please enter the name.'),
-  mobile: yup.string().required('Please enter the phone number.'),
-  banner: yup.string().required('Please add banner'),
+  mobile: yup
+    .string()
+    .min(10)
+    .max(10)
+    .required('Please enter the phone number.'),
   location: yup.string().required('Please add location'),
-  country_code: yup.string().required('Please enter the country code'),
-  zipcode: yup.string().required('Please enter the zip code'),
+  zipcode: yup.string().max(6,"Please enter the valid zipcode.").required('Please enter the zip code'),
   description: yup.string().required('Please enter the description'),
 });

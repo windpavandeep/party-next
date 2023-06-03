@@ -9,6 +9,8 @@ import {RootStackParamList} from '@src/utils';
 import {useAppDispatch, useAppSelector} from '@src/app/hooks';
 import {userLoginAsync} from '@src/feature/auth/authApi';
 import {Formik} from 'formik';
+import {loginFormScheme} from '@src/form-schemas/auth';
+import {GooglePlacesAutocomplete} from 'react-native-google-places-autocomplete';
 
 const LoginScreen = () => {
   const {navigate, replace} =
@@ -28,10 +30,21 @@ const LoginScreen = () => {
       }
     });
   };
+
   return (
     <SafeAreaView style={styles.btnContinueParent}>
-      <Formik initialValues={{username: '', password: ''}} onSubmit={onSubmit}>
-        {({handleChange, handleBlur, handleSubmit, values}) => (
+      <Formik
+        initialValues={{username: '', password: ''}}
+        validationSchema={loginFormScheme}
+        onSubmit={onSubmit}>
+        {({
+          handleChange,
+          handleBlur,
+          handleSubmit,
+          values,
+          errors,
+          touched,
+        }) => (
           <>
             <GradientButton
               loading={!!loading}
@@ -51,6 +64,11 @@ const LoginScreen = () => {
                 onBlur={handleBlur('password')}
                 value={values.password}
                 secureTextEntry
+                error={
+                  errors?.password && touched.password
+                    ? errors.password
+                    : undefined
+                }
               />
               <Text style={[styles.placeholder1, styles.placeholderPosition]}>
                 Get OTP
@@ -62,12 +80,17 @@ const LoginScreen = () => {
                 onChangeText={handleChange('username')}
                 onBlur={handleBlur('username')}
                 value={values.username}
+                error={
+                  errors?.username && touched.username
+                    ? errors.username
+                    : undefined
+                }
               />
             </View>
+
             <Text style={{marginTop: 10}}>
               <Text style={styles.dontHaveAn}>Don’t have an account?</Text>
               <Text onPress={() => navigate('SignUp')} style={styles.signUp}>
-                {' '}
                 Sign up
               </Text>
             </Text>

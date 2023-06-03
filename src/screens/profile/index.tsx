@@ -39,7 +39,7 @@ const Profile = () => {
       const data = new Date();
 
       setImage(res);
-      const imageRes = await imageChange(
+      await imageChange(
         createFormData('image', res?.assets?.[0], {}),
         user?.id,
       );
@@ -49,9 +49,10 @@ const Profile = () => {
       const userUpdated = {
         ...user,
         image: imageName,
-        updated: data.getTime(),
       };
       delete userUpdated.token;
+      delete userUpdated.created;
+      delete userUpdated.updated;
       dispatch(updateUserAsync(userUpdated));
     } catch (error) {
       console.log(' == error ===> ', error);

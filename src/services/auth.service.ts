@@ -14,6 +14,9 @@ export const userLogin = (payload: LoginPayloadTypes) =>
 export const userSignup = (payload: SignupPayloadTypes) =>
   axiosApi.post(PATHS.signup, payload);
 
+export const getUserDetail = (id: number) =>
+  axiosApi.get(`${PATHS.users}/${id}`);
+
 export const userUpdate = (payload: SignupPayloadTypes) =>
   axiosApi.put(PATHS.users, payload);
 

@@ -8,12 +8,14 @@ export const inputHelper = (
   values: any,
   errors: any,
   touched: any,
-) => ({
-  onChangeText: handleChange(key),
-  onBlur: handleBlur(key),
-  value: values[key],
-  error: errors[key] && touched[key] ? errors[key] : undefined,
-});
+) => {
+  return {
+    onChangeText: handleChange(key),
+    onBlur: handleBlur(key),
+    value: values[key],
+    error: errors[key] || touched[key] ? errors[key] : undefined,
+  };
+};
 
 export const createFormData = (name: string, photo: any, body: any = {}) => {
   const data = new FormData();
@@ -33,4 +35,31 @@ export const createFormData = (name: string, photo: any, body: any = {}) => {
 
 export const renderImage = (url: string) => {
   return `${IMAGE_BASE}${url}`;
+};
+
+export const convertAddressComponents = (addrComp: any) => {
+  let newAddr: any = {};
+  let address_1: any = [];
+  addrComp.forEach((el: any, i: any) => {
+    if (el.types.includes('post_box')) {
+      address_1.push(el.long_name);
+    } else if (el.types.includes('street_number')) {
+      address_1.push(el.long_name);
+    } else if (el.types.includes('route')) {
+      address_1.push(el.long_name);
+    } else if (el.types.includes('subpremise')) {
+      newAddr.address_2 = el.long_name;
+    } else if (el.types.includes('locality')) {
+      newAddr.city = el.long_name;
+    } else if (el.types.includes('administrative_area_level_1')) {
+      newAddr.state = el.long_name;
+    } else if (el.types.includes('postal_code')) {
+      newAddr.zip_code = el.short_name;
+    } else if (el.types.includes('country')) {
+      newAddr.country = el.long_name;
+    }
+  });
+  newAddr.address_1 = address_1.join(' ');
+
+  return newAddr;
 };

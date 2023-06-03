@@ -43,8 +43,14 @@ import PLUS_ADD from '@assets/icons/plus-add.svg';
 import MALE_ICON from '@assets/icons/male.svg';
 import FEMALE_ICON from '@assets/icons/female.svg';
 import COUPLE_ICON from '@assets/icons/couple-type.svg';
+import COUPLE_ICON_LIGHT from '@assets/icons/couple-light.svg';
+import MALE_LIGHT from '@assets/icons/male-light.svg';
+import FEMALE_LIGHT from '@assets/icons/female-light.svg';
 
 export {
+  FEMALE_LIGHT,
+  MALE_LIGHT,
+  COUPLE_ICON_LIGHT,
   MALE_ICON,
   FEMALE_ICON,
   COUPLE_ICON,

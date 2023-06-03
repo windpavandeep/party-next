@@ -100,6 +100,7 @@ const SignUp = () => {
                 onChangeText={handleChange('mobile')}
                 onBlur={handleBlur('mobile')}
                 value={values.mobile}
+                maxLength={10}
                 error={
                   errors.mobile && touched.mobile ? errors.mobile : undefined
                 }

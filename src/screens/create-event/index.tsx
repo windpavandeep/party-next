@@ -10,7 +10,15 @@ import {
 import {FontSize, FontFamily, Color, MarginTop} from '@utils/GlobalStyles';
 import PageContainer from '@components/Container';
 import GradientButton from '@components/Button';
-import {GALLERY_EXPORT, INPUT_LOCATION, PLUS_ADD} from '@assets/icons';
+import {
+  COUPLE_ICON_LIGHT,
+  FEMALE_LIGHT,
+  GALLERY_EXPORT,
+  INPUT_LOCATION,
+  MALE_LIGHT,
+  PLUS_ADD,
+  TRASH,
+} from '@assets/icons';
 import AppInput, {
   InputDatePicker,
   InputPicker,
@@ -29,11 +37,41 @@ import {
 } from '@src/feature/events/eventApi';
 import * as ImagePicker from 'react-native-image-picker';
 
+const ShowTicketGridItem = ({item}: {item: any}) => {
+  console.log(' === item ===> ', item);
+  return (
+    <TouchableOpacity
+      style={[
+        styles.vuesaxoutlinegalleryExportParent,
+        {justifyContent: 'center', alignItems: 'center', padding: 5},
+      ]}>
+      <View style={styles.ticketHeaderContainer}>
+        {item?.ticketType === 'couple' && <COUPLE_ICON_LIGHT />}
+        {item?.ticketType === 'male' && <MALE_LIGHT />}
+        {item?.ticketType === 'female' && <FEMALE_LIGHT />}
+        <Text style={styles.ticketNameText}>
+          <Text style={{color: Color.textWhiteFFFFFF}}>
+            {item?.total_tickets}
+          </Text>
+          {item?.ticketType}
+        </Text>
+      </View>
+      <Text style={styles.ticketTypeText}>Guestlist</Text>
+      <Text style={styles.ticketTimeText}>After 9:30 PM</Text>
+      <View style={styles.dividerLine} />
+      <View style={styles.ticketFooter}>
+        <Text>Rs. 2000</Text>
+        <TRASH />
+      </View>
+    </TouchableOpacity>
+  );
+};
+
 const CreateEvent = () => {
   const [bannerImage, setBannerImage] = React.useState<any>(null);
   const [gallary, setGallary] = React.useState<any>(null);
   const [showAddTicket, setShowAddTicket] = React.useState<boolean>(false);
-  const [step, setStep] = React.useState<number>(1);
+  const [step, setStep] = React.useState<number>(2);
   const [amenities, setAmenities] = React.useState<string[]>(['']);
   const [amenitiesText, setAmenitiesText] = React.useState<string>('');
   const [newTicket, setNewTicket] = React.useState<object[]>([]);
@@ -101,6 +139,8 @@ const CreateEvent = () => {
     }
   };
 
+  console.log(' === response ===> ', newTicket);
+
   return (
     <PageContainer loading={loading} useSafeArea={false}>
       <>
@@ -108,12 +148,12 @@ const CreateEvent = () => {
           show={showAddTicket}
           onClose={() => setShowAddTicket(false)}
           onConfirm={(res: any) => {
-            setNewTicket(res);
+            setNewTicket(p => [...p, res]);
             setShowAddTicket(false);
-            addTicket({
-              ...res,
-              event_id: event?.id,
-            });
+            // addTicket({
+            //   ...res,
+            //   event_id: event?.id,
+            // });
           }}
         />
         {step === 1 && (
@@ -359,6 +399,9 @@ const CreateEvent = () => {
                     style={styles.vuesaxoutlinegalleryExportParent}>
                     <PLUS_ADD />
                   </TouchableOpacity>
+                  {newTicket.map(t => (
+                    <ShowTicketGridItem item={t} />
+                  ))}
                 </View>
                 <View style={styles.divider} />
                 <LabelTypo
@@ -400,6 +443,40 @@ const CreateEvent = () => {
 };
 
 const styles = StyleSheet.create({
+  ticketHeaderContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    width: '100%',
+  },
+  ticketNameText: {
+    fontSize: FontSize.size_3xs + 2,
+    fontFamily: FontFamily.poppinsRegular,
+    marginLeft: 10,
+    color: Color.gray_200,
+  },
+  dividerLine: {},
+  ticketFooter: {
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  ticketTypeText: {
+    fontSize: FontSize.size_3xs + 2,
+    fontFamily: FontFamily.poppinsSemibold,
+    color: Color.gray_200,
+    textAlign: 'left',
+    width: '100%',
+  },
+  ticketTimeText: {
+    fontSize: FontSize.size_3xs + 2,
+    fontFamily: FontFamily.poppinsSemibold,
+    color: Color.textWhiteFFFFFF,
+    textAlign: 'left',
+    width: '100%',
+  },
   headTypo: {
     textAlign: 'left',
     width: '100%',
