@@ -1,12 +1,19 @@
 import {StyleSheet, Text, View} from 'react-native';
-import {COUPLE} from '@assets/icons';
+import {
+  COUPLE,
+  COUPLE_ICON_LIGHT,
+  FEMALE_LIGHT,
+  MALE_LIGHT,
+} from '@assets/icons';
 import {Color, FontFamily, FontSize} from '@utils/GlobalStyles';
+import moment from 'moment';
 
 interface Props {
   type?: 0 | 1; // 0 default if you are passing 1 then it will be different design style
+  item?: any;
 }
 
-const TicketType = ({type = 0}: Props) => {
+const TicketType = ({type = 0, item}: Props) => {
   if (type === 1) {
     return (
       <View style={[styles.container, {flex: 1 / 2, minHeight: 125}]}>
@@ -18,28 +25,33 @@ const TicketType = ({type = 0}: Props) => {
           </Text>
         </View>
         <View style={styles.pillsContianer}>
-          <Text style={styles.pillsItem}>Table Charge</Text>
-          <Text style={styles.pillsItem}>Sofa</Text>
+          <Text style={styles.pillsItem}>{item?.visit_type}</Text>
+          <Text style={styles.pillsItem}>{item?.table_type}</Text>
         </View>
-        <Text style={styles.offerText}>After 9:30 PM</Text>
+        <Text style={styles.offerText}>{item?.beforeafter}</Text>
         <View style={styles.divider} />
-        <Text style={styles.offerText}>Rs. 2000</Text>
+        <Text style={styles.offerText}>Rs. {item?.price}</Text>
       </View>
     );
   }
   return (
     <View style={styles.container}>
       <View style={styles.couple}>
-        <COUPLE />
+        {item?.ticket_type === 'couple' && <COUPLE_ICON_LIGHT />}
+        {item?.ticket_type === 'male' && <MALE_LIGHT />}
+        {item?.ticket_type === 'female' && <FEMALE_LIGHT />}
         <Text style={styles.offerText}>
-          15
-          <Text style={{color: Color.gray_200}}> Couple</Text>
+          {item?.total_ticket}
+          <Text style={{color: Color.gray_200}}> {item?.name}</Text>
         </Text>
       </View>
-      <Text style={{color: Color.gray_200}}> Guestlist</Text>
-      <Text style={styles.offerText}>After 9:30 PM</Text>
+      <Text style={{color: Color.gray_200}}> {item?.visit_type}</Text>
+      <Text style={styles.offerText}>
+        {item?.beforeafter}{' '}
+        {moment(parseInt(item?.ticket_time)).format('HH:MM A')}
+      </Text>
       <View style={styles.divider} />
-      <Text style={styles.offerText}>Rs. 2000</Text>
+      <Text style={styles.offerText}>Rs. {item?.price}</Text>
     </View>
   );
 };

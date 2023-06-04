@@ -1,5 +1,7 @@
 import {
+  ActivityIndicator,
   Image,
+  ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -9,48 +11,35 @@ import {
 import PageContainer from '@components/Container';
 import {Avatar, Carousel} from 'react-native-ui-lib';
 import {Color, FontFamily, FontSize} from '@utils/GlobalStyles';
-import {useMemo} from 'react';
+import {useEffect, useMemo, useState} from 'react';
 import {CALENDOR, OFFER_CODE, ROUNDER_LOCATION, SHARE} from '@assets/icons';
 import TicketType from '@components/TicketType';
 import Divider from '@components/Divider';
 import GradientButton from '@components/Button';
-
-const IMAGES = [
-  'https://images.pexels.com/photos/2529159/pexels-photo-2529159.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500',
-  'https://images.pexels.com/photos/2529146/pexels-photo-2529146.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500',
-  'https://images.pexels.com/photos/2529158/pexels-photo-2529158.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500',
-];
-
-const RenderDetailItemData = [
-  {
-    icon: OFFER_CODE,
-    title: '20% OFF',
-    boldText: 'Use Code:',
-    smallText: 'HAPPYFRIDAY',
-  },
-  {
-    icon: CALENDOR,
-    title: 'March 16, 2023',
-    boldText: 'Thursday, ',
-    smallText: '09:00 PM - 02:00 AM',
-  },
-  {
-    icon: ROUNDER_LOCATION,
-    title: undefined,
-    boldText: undefined,
-    smallText:
-      '7/2-4, Siddhi Garden, Near Mhatre Bridge, Erandwane, Pune, Maharashtra 411004',
-  },
-];
+import {useRoute} from '@react-navigation/native';
+import {useAppSelector} from '@src/app/hooks';
+import moment from 'moment';
+import {daysInWeek, renderImage} from '@src/utils/helper';
+import {getTicketWithEventId} from '@src/services/event.service';
 
 const EventDetails = () => {
+  const {params} = useRoute() as any;
+  const {list} = useAppSelector(({eventSlice}) => eventSlice);
+  const {club} = useAppSelector(({clubSlice}) => clubSlice) as any;
+  const [eventDetail, setEventDetails] = useState<any>({});
+  const [ticket, setTickets] = useState<any>([]);
+  const [ticketLoading, setTicketLoading] = useState<boolean>(false);
+
+  const IMAGES = useMemo(() => {
+    return [renderImage(eventDetail?.cover_pic)];
+  }, [eventDetail]);
+
   const CarouselRender = useMemo(
     () => (
-      <Carousel loop>
+      <Carousel key={112} loop>
         {IMAGES.map((i, index) => (
-          <View key={index} style={styles.sliderItem}>
+          <View key={index + 10} style={styles.sliderItem}>
             <Image
-              key={index}
               source={{
                 uri: i,
               }}
@@ -63,8 +52,54 @@ const EventDetails = () => {
         ))}
       </Carousel>
     ),
-    [],
+    [eventDetail],
   );
+
+  useEffect(() => {
+    setEventDetails(list.find((i: any) => i?.id === params.id));
+  }, []);
+
+  const RenderDetailItemData = useMemo(
+    () => [
+      {
+        icon: OFFER_CODE,
+        title: `${eventDetail?.offer_name}% OFF`,
+        boldText: 'Use Code:',
+        smallText: `${eventDetail?.offer_code}`,
+      },
+      {
+        icon: CALENDOR,
+        title: moment(eventDetail?.event_date).format('MMMM DD, YYYY'),
+        boldText: daysInWeek[moment(eventDetail?.event_date).day()],
+        smallText: `${moment(eventDetail?.start_time).format(
+          'HH:MM A',
+        )} - ${moment(eventDetail?.end_time).format('HH:MM A')}`,
+      },
+      {
+        icon: ROUNDER_LOCATION,
+        title: undefined,
+        boldText: undefined,
+        smallText: eventDetail?.location,
+      },
+    ],
+    [eventDetail],
+  );
+
+  useEffect(() => {
+    const getTickets = async () => {
+      setTicketLoading(true);
+      try {
+        const res = await getTicketWithEventId(eventDetail?.id);
+        console.log(' == list ticket ===> ', res.data);
+        setTickets(res.data);
+      } catch (error) {
+        console.log(' ==== error ===> ', error);
+      } finally {
+        setTicketLoading(false);
+      }
+    };
+    getTickets();
+  }, [eventDetail]);
 
   return (
     <>
@@ -72,12 +107,14 @@ const EventDetails = () => {
         <>
           <View style={[styles.headerContainer]}>{CarouselRender}</View>
           <View style={styles.contentContainer}>
-            <Text style={styles.titleText}>Holi Celebration</Text>
-            <Text style={styles.subTitle}>Playboy Club</Text>
+            <Text style={styles.titleText}>{eventDetail?.event_name}</Text>
+            <Text style={styles.subTitle}>{club?.club?.name}</Text>
             <View style={styles.tagsContainer}>
               <View style={styles.tags}>
-                <Text style={styles.tagText}>Music</Text>
-                <Text style={[styles.tagText, {marginLeft: 5}]}>Night</Text>
+                <Text style={styles.tagText}>{eventDetail?.event_type}</Text>
+                <Text style={[styles.tagText, {marginLeft: 5}]}>
+                  {eventDetail?.event_time_type}
+                </Text>
               </View>
               <View style={styles.avatarContianer}>
                 <Avatar
@@ -88,7 +125,7 @@ const EventDetails = () => {
                   size={26}
                   imageStyle={styles.avatar}
                 />
-                <Text style={styles.soldText}>220 Sold</Text>
+                <Text style={styles.soldText}>0 Sold</Text>
                 <Text style={styles.viewAllText}>View all</Text>
               </View>
             </View>
@@ -96,7 +133,7 @@ const EventDetails = () => {
           {/* Detail */}
           <View style={styles.detailContainer}>
             {RenderDetailItemData.map((i, indx) => (
-              <View key={indx} style={styles.detailItem}>
+              <View key={indx + 30} style={styles.detailItem}>
                 <i.icon />
                 <View style={styles.textContainer}>
                   {i?.title && (
@@ -115,12 +152,7 @@ const EventDetails = () => {
           <View style={styles.detailContainer}>
             <Text style={styles.titleText}>About Event</Text>
             <Text style={[styles.offerText, {color: Color.gray_200}]}>
-              Lorem Ipsum is simply dummy text of the printing and typesetting
-              industry. Lorem Ipsum has been the industry's standard dummy text
-              ever since the 1500s, when an unknown printer took a galley of
-              type and scrambled it to make a type specimen book. It has
-              survived not only five centuries, but also the leap into
-              electronic typesetting, remaining essentially.
+              {eventDetail?.about_event}
             </Text>
           </View>
           <View style={styles.detailContainer}>
@@ -137,29 +169,49 @@ const EventDetails = () => {
             ]}>
             <View>
               <Text style={{color: Color.gray_200}}>Ticket Available</Text>
-              <Text style={styles.offerText}>97</Text>
+              <Text style={styles.offerText}>
+                {' '}
+                {(ticket ?? [])
+                  .filter((i: any) => i?.type === 'ticket')
+                  .map((i: any) => i?.total_ticket)
+                  .filter((i: any) => i)
+                  .reduce((p: any, n: any) => parseInt(p) + parseInt(n), 0)}
+              </Text>
             </View>
             <View>
               <Text style={{color: Color.gray_200}}>Purchase Deadline</Text>
-              <Text style={styles.offerText}>20-03-2023</Text>
+              <Text style={styles.offerText}>
+                {moment(eventDetail?.last_booking_date).format('DD-MM-YYYY')}
+              </Text>
             </View>
           </View>
           {/*  */}
-          <View
-            style={[
-              styles.detailContainer,
-              {
-                flex: 1,
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-              },
-            ]}>
-            <TicketType />
-            <Divider size={10} />
-            <TicketType />
-            <Divider size={10} />
-            <TicketType />
-          </View>
+          {ticketLoading ? (
+            <ActivityIndicator />
+          ) : (
+            <ScrollView
+              horizontal
+              style={[
+                styles.detailContainer,
+                {
+                  flex: 1,
+                  flexDirection: 'row',
+                  width: '100%',
+                },
+              ]}>
+              {(ticket ?? [])
+                .filter((i: any) => i?.type === 'ticket')
+                .map((i: any, index: any) => {
+                  return (
+                    <>
+                      <TicketType item={i} />
+                      <Divider size={10} />
+                    </>
+                  );
+                })}
+            </ScrollView>
+          )}
+
           {/*  */}
           <View style={styles.detailContainer}>
             <Text style={styles.titleText}>Table and Blueprint</Text>
@@ -176,27 +228,43 @@ const EventDetails = () => {
               <Text style={{color: Color.gray_200}}>
                 Upload Tables Blueprint
               </Text>
-              <Text style={styles.offerText}>image12323.jpeg</Text>
+              <Text style={styles.offerText}>{club?.club?.table_image}</Text>
             </View>
             <View>
               <Text style={{color: Color.gray_200}}>Ticket Available</Text>
-              <Text style={styles.offerText}>97</Text>
+              <Text style={styles.offerText}>
+                {(ticket ?? [])
+                  .filter((i: any) => i?.type === 'table')
+                  .map((i: any) => i?.total_ticket)
+                  .filter((i: any) => i)
+                  .reduce((p: any, n: any) => parseInt(p) + parseInt(n), 0)}
+              </Text>
             </View>
           </View>
           {/*  */}
-          <View
+
+          <ScrollView
+            horizontal
             style={[
               styles.detailContainer,
               {
                 flex: 1,
                 flexDirection: 'row',
-                justifyContent: 'space-between',
+                width: '100%',
               },
             ]}>
-            <TicketType type={1} />
-            <Divider size={10} />
-            <TicketType type={1} />
-          </View>
+            {(ticket ?? [])
+              .filter((i: any) => i?.type === 'table')
+              .map((i: any, index: any) => {
+                return (
+                  <>
+                    <TicketType item={i} type={1} />
+                    <Divider size={10} />
+                  </>
+                );
+              })}
+          </ScrollView>
+          <View style={{height: 100}} />
         </>
       </PageContainer>
       <View style={[styles.detailContainer, styles.btnSaveAbs]}>

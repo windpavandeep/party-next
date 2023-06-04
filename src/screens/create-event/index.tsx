@@ -25,20 +25,29 @@ import AppInput, {
   InputTimePicker,
   LabelTypo,
 } from '@src/components/Input';
-import {inputHelper} from '@src/utils/helper';
 import Pill from '@src/components/pill';
-import {Formik} from 'formik';
 import {Button, RadioButton, RadioGroup} from 'react-native-ui-lib';
-import {AddTicket} from '@src/components/Modal';
+import {AddTicket, AddTicketTable} from '@src/components/Modal';
 import {useAppDispatch, useAppSelector} from '@src/app/hooks';
 import {
   createEventAsync,
   createTicketAsync,
 } from '@src/feature/events/eventApi';
 import * as ImagePicker from 'react-native-image-picker';
+import {bannerChange} from '@src/services/event.service';
+import {createFormData} from '@src/utils/helper';
+import Toast from 'react-native-toast-message';
+import {RootStackParamList} from '@src/utils';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {useNavigation} from '@react-navigation/native';
 
-const ShowTicketGridItem = ({item}: {item: any}) => {
-  console.log(' === item ===> ', item);
+const ShowTicketGridItem = ({
+  item,
+  onRemoveItem,
+}: {
+  item: any;
+  onRemoveItem: any;
+}) => {
   return (
     <TouchableOpacity
       style={[
@@ -52,15 +61,66 @@ const ShowTicketGridItem = ({item}: {item: any}) => {
         <Text style={styles.ticketNameText}>
           <Text style={{color: Color.textWhiteFFFFFF}}>
             {item?.total_tickets}
-          </Text>
+          </Text>{' '}
           {item?.ticketType}
         </Text>
       </View>
-      <Text style={styles.ticketTypeText}>Guestlist</Text>
-      <Text style={styles.ticketTimeText}>After 9:30 PM</Text>
+      <Text style={styles.ticketTypeText}>{item?.list}</Text>
+      {item?.timeonoff && (
+        <Text style={styles.ticketTimeText}>{item?.beforeAfetr} 9:30 PM</Text>
+      )}
       <View style={styles.dividerLine} />
       <View style={styles.ticketFooter}>
-        <Text>Rs. 2000</Text>
+        <Text style={styles.pricePrint}>Rs. {item?.price}</Text>
+        <TouchableOpacity onPress={onRemoveItem}>
+          <TRASH />
+        </TouchableOpacity>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
+const ShowTicketGridTableItem = ({item}: {item: any}) => {
+  return (
+    <TouchableOpacity
+      style={[
+        styles.vuesaxoutlinegalleryExportParent,
+        {
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: 10,
+          height: 120,
+          width: '49%',
+        },
+      ]}>
+      <View style={styles.ticketHeaderContainer}>
+        <Text style={[styles.ticketNameText, {marginLeft: 0}]}>
+          <Text style={{color: Color.textWhiteFFFFFF}}>
+            {item?.table_no} for
+          </Text>{' '}
+          {item?.total_no_people} people
+        </Text>
+      </View>
+      <View style={styles.makePillContainer}>
+        {item?.table_type && (
+          <Text style={[styles.ticketTypeText, styles.makePill]}>
+            {item?.table_type}
+          </Text>
+        )}
+
+        {item?.table_style && (
+          <Text
+            style={[styles.ticketTypeText, styles.makePill, {marginLeft: 5}]}>
+            {item?.table_style}
+          </Text>
+        )}
+      </View>
+      {item?.timeonoff && (
+        <Text style={styles.ticketTimeText}>{item?.beforeAfetr} 9:30 PM</Text>
+      )}
+      <View style={styles.dividerLine} />
+      <View style={styles.ticketFooter}>
+        <Text style={styles.pricePrint}>Rs. {item?.price}</Text>
         <TRASH />
       </View>
     </TouchableOpacity>
@@ -71,15 +131,22 @@ const CreateEvent = () => {
   const [bannerImage, setBannerImage] = React.useState<any>(null);
   const [gallary, setGallary] = React.useState<any>(null);
   const [showAddTicket, setShowAddTicket] = React.useState<boolean>(false);
-  const [step, setStep] = React.useState<number>(2);
+  const [showAddTicketTable, setShowAddTicketTable] =
+    React.useState<boolean>(false);
+  const [step, setStep] = React.useState<number>(1);
   const [amenities, setAmenities] = React.useState<string[]>(['']);
   const [amenitiesText, setAmenitiesText] = React.useState<string>('');
+  const [privacy, setPrivacy] = React.useState<string[]>(['']);
+  const [privacyText, setPrivacyText] = React.useState<string>('');
   const [newTicket, setNewTicket] = React.useState<object[]>([]);
+  const [newTicketTable, setNewTicketTable] = React.useState<object[]>([]);
   const [formData, setFormData] = React.useState<object>({}) as any;
+  const [last_booking_date, setLastBookingDate] = React.useState<any>();
   const dispatch = useAppDispatch();
   const {user} = useAppSelector(({authUser}) => authUser) as any;
   const {loading, event} = useAppSelector(({eventSlice}) => eventSlice) as any;
   const {width} = useWindowDimensions();
+  const {navigate} = useNavigation<StackNavigationProp<RootStackParamList>>();
 
   const onChangeInputValue = (key: any, value: any) => {
     setFormData((p: any) => ({
@@ -95,22 +162,70 @@ const CreateEvent = () => {
       userId: user?.id,
     };
 
+    console.log(payload);
+
     dispatch(createEventAsync(payload)).then(res => {
       if (res.meta.requestStatus === 'fulfilled') {
         setStep(p => p + 1);
       }
     });
-    // setTimeout(() => {
-    //   console.error('Server not responding');
-    //   console.error('Databse memory out of bounds');
-    //   devToolsEnhancer();
-    // }, 2000);
   };
 
-  const addTicket = (res: any) => {
-    dispatch(createTicketAsync(newTicket)).then(r => {
-      console.log(' === res === ', r);
-    });
+  const addTicket = () => {
+    if (newTicket.length < 0) {
+      Toast.show({
+        type: 'error',
+        text1: 'Please add atleast one ticket.',
+      });
+    } else {
+      const payload = {
+        ...(newTicket.length > 0 && {
+          tickets: newTicket.map((i: any) => ({
+            beforeafter: i?.beforeAfetr,
+            visit_type: i?.list,
+            name: i?.name,
+            price: i?.price,
+            ticket_type: i?.ticketType,
+            ticket_time: i?.time,
+            onoff: i?.timeonoff,
+            total_ticket: i?.total_tickets,
+            event_id: event?.id,
+          })),
+        }),
+        ...(newTicketTable.length > 0 && {
+          tables: newTicketTable.map((i: any) => ({
+            name: i?.table_no,
+            total_ticket: i?.total_tickets,
+            total_table: i?.table_no,
+            no_of_people: i?.total_no_people,
+            table_type: i?.table_style,
+            price: i?.price,
+            visit_type: i?.table_type,
+            event_id: event?.id,
+          })),
+        }),
+        event_id: event?.id,
+        updatedKeys: {
+          statuss: 'publish',
+          last_booking_date: last_booking_date,
+          ...(formData?.offer_name && {
+            offer_name: formData?.offer_name,
+          }),
+          ...(formData?.offer_code && {
+            offer_code: formData?.offer_code,
+          }),
+          ...(formData?.privacy && {
+            terms: formData?.privacy,
+          }),
+        },
+      };
+      dispatch(createTicketAsync(payload)).then(r => {
+        console.log(' === res === ', r);
+        if (r.meta.requestStatus === 'fulfilled') {
+          navigate('Home');
+        }
+      });
+    }
   };
 
   const onAddBanner = async () => {
@@ -119,11 +234,28 @@ const CreateEvent = () => {
         mediaType: 'photo',
         selectionLimit: 1,
       });
+
       setBannerImage(res);
-    } catch (error: any) {
-      console.log(' == error ===> ', error, error?.response);
+      await bannerChange(
+        createFormData('banner', res?.assets?.[0], {}),
+        event?.id,
+      );
+      const ext: any = (res?.assets?.[0]?.fileName ?? '').split('.').pop();
+      const imageName = `${event?.id}-banner.${ext}`;
+
+      dispatch(
+        createTicketAsync({
+          event_id: event?.id,
+          updatedKeys: {
+            cover_pic: imageName,
+          },
+        }),
+      ).then(() => {});
+    } catch (error) {
+      console.log(' == error ===> ', error);
     }
   };
+
   const onAddGallery = async (index: number) => {
     try {
       const res = await ImagePicker.launchImageLibrary({
@@ -139,7 +271,30 @@ const CreateEvent = () => {
     }
   };
 
-  console.log(' === response ===> ', newTicket);
+  const ticketRemovee = React.useCallback(
+    (index: number) => {
+      setNewTicket(p => {
+        const arr = p;
+        arr.splice(index, 1);
+        return p;
+      });
+    },
+    [newTicket],
+  );
+
+  const renderTickets = React.useMemo((): any => {
+    return (
+      <>
+        {newTicket.map((t, index) => (
+          <ShowTicketGridItem
+            onRemoveItem={() => ticketRemovee(index)}
+            key={index}
+            item={t}
+          />
+        ))}
+      </>
+    );
+  }, [newTicket]);
 
   return (
     <PageContainer loading={loading} useSafeArea={false}>
@@ -150,85 +305,18 @@ const CreateEvent = () => {
           onConfirm={(res: any) => {
             setNewTicket(p => [...p, res]);
             setShowAddTicket(false);
-            // addTicket({
-            //   ...res,
-            //   event_id: event?.id,
-            // });
+          }}
+        />
+        <AddTicketTable
+          show={showAddTicketTable}
+          onClose={() => setShowAddTicketTable(false)}
+          onConfirm={(res: any) => {
+            setNewTicketTable(p => [...p, res]);
+            setShowAddTicketTable(false);
           }}
         />
         {step === 1 && (
           <>
-            <View style={[styles.inputContianer]}>
-              <TouchableOpacity
-                style={[
-                  styles.vuesaxoutlinegalleryExportParent,
-                  {
-                    flex: 1,
-                    width: width - 40,
-                    height: 160,
-                  },
-                ]}
-                onPress={onAddBanner}>
-                <GALLERY_EXPORT />
-                <Text
-                  style={[styles.typeTheVerification, {textAlign: 'center'}]}>
-                  Upload cove photo
-                </Text>
-                {bannerImage && (
-                  <Image
-                    source={{
-                      uri: bannerImage?.assets?.[0].uri,
-                    }}
-                    style={{
-                      width: '99.%',
-                      height: 158,
-                      position: 'absolute',
-                      borderRadius: 10,
-                    }}
-                  />
-                )}
-              </TouchableOpacity>
-              <View
-                style={[
-                  styles.ticketContainer,
-                  {
-                    marginTop: 10,
-                    flex: 1,
-                    width: width - 40,
-                    paddingLeft: 0,
-                    paddingTop: 0,
-                    paddingRight: 0,
-                  },
-                ]}>
-                {[1, 2, 3, 4, 5, 6].map(index => {
-                  return (
-                    <TouchableOpacity
-                      key={index}
-                      onPress={() => onAddGallery(index)}
-                      style={[
-                        styles.vuesaxoutlinegalleryExportParent,
-                        {marginTop: 12, marginLeft: 5},
-                      ]}>
-                      {gallary?.[index] ? (
-                        <Image
-                          source={{
-                            uri: gallary?.[index]?.assets?.[0].uri,
-                          }}
-                          style={{
-                            width: '99.%',
-                            height: 102,
-                            position: 'absolute',
-                            borderRadius: 10,
-                          }}
-                        />
-                      ) : (
-                        <PLUS_ADD />
-                      )}
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            </View>
             <View style={[styles.inputContianer]}>
               <LabelTypo
                 label="Event Details"
@@ -386,54 +474,195 @@ const CreateEvent = () => {
         )}
         {step === 2 && (
           <>
-            <>
-              <View style={styles.inputContianer}>
-                <LabelTypo
-                  label="Tickets and Payments"
-                  fontSize={20}
-                  textStyle={styles.headTypo}
-                />
-                <View style={styles.ticketContainer}>
-                  <TouchableOpacity
-                    onPress={() => setShowAddTicket(true)}
-                    style={styles.vuesaxoutlinegalleryExportParent}>
-                    <PLUS_ADD />
-                  </TouchableOpacity>
-                  {newTicket.map(t => (
-                    <ShowTicketGridItem item={t} />
-                  ))}
-                </View>
-                <View style={styles.divider} />
-                <LabelTypo
-                  textStyle={styles.headTypo}
-                  label="Choose a Ticket Purchase Deadline"
-                />
-                <InputDatePicker
-                  inputStyle={{
-                    paddingLeft: 10,
-                    color: Color.textWhiteFFFFFF,
-                  }}
-                />
-                <View style={styles.divider} />
-                <LabelTypo
-                  label="Table and Blueprint"
-                  fontSize={20}
-                  textStyle={styles.headTypo}
-                />
-                <View style={styles.ticketContainer}>
-                  <TouchableOpacity
-                    onPress={() => setShowAddTicket(true)}
-                    style={styles.vuesaxoutlinegalleryExportParent}>
-                    <PLUS_ADD />
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.divider} />
+            <View style={[styles.inputContianer]}>
+              <TouchableOpacity
+                style={[
+                  styles.vuesaxoutlinegalleryExportParent,
+                  {
+                    flex: 1,
+                    width: width - 40,
+                    height: 160,
+                  },
+                ]}
+                onPress={onAddBanner}>
+                <GALLERY_EXPORT />
+                <Text
+                  style={[styles.typeTheVerification, {textAlign: 'center'}]}>
+                  Upload cove photo
+                </Text>
+                {bannerImage && (
+                  <Image
+                    source={{
+                      uri: bannerImage?.assets?.[0].uri,
+                    }}
+                    style={{
+                      width: '99.%',
+                      height: 158,
+                      position: 'absolute',
+                      borderRadius: 10,
+                    }}
+                  />
+                )}
+              </TouchableOpacity>
+              <View
+                style={[
+                  styles.ticketContainer,
+                  {
+                    marginTop: 10,
+                    flex: 1,
+                    width: width - 40,
+                    paddingLeft: 0,
+                    paddingTop: 0,
+                    paddingRight: 0,
+                  },
+                ]}>
+                {[1, 2, 3, 4, 5, 6].map(index => {
+                  return (
+                    <TouchableOpacity
+                      key={index}
+                      onPress={() => onAddGallery(index)}
+                      style={[
+                        styles.vuesaxoutlinegalleryExportParent,
+                        {marginTop: 12, marginLeft: 5},
+                      ]}>
+                      {gallary?.[index] ? (
+                        <Image
+                          source={{
+                            uri: gallary?.[index]?.assets?.[0].uri,
+                          }}
+                          style={{
+                            width: '99.%',
+                            height: 102,
+                            position: 'absolute',
+                            borderRadius: 10,
+                          }}
+                        />
+                      ) : (
+                        <PLUS_ADD />
+                      )}
+                    </TouchableOpacity>
+                  );
+                })}
               </View>
+            </View>
+            <View style={styles.inputContianer}>
+              <LabelTypo
+                label="Tickets and Payments"
+                fontSize={20}
+                textStyle={styles.headTypo}
+              />
+              <View style={styles.ticketContainer}>
+                {renderTickets}
+                <TouchableOpacity
+                  onPress={() => setShowAddTicket(true)}
+                  style={styles.vuesaxoutlinegalleryExportParent}>
+                  <PLUS_ADD />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.divider} />
+              <LabelTypo
+                textStyle={styles.headTypo}
+                label="Choose a Ticket Purchase Deadline"
+              />
+              <InputDatePicker
+                inputStyle={{
+                  paddingLeft: 10,
+                  color: Color.textWhiteFFFFFF,
+                }}
+                onChangeText={(date: any) => setLastBookingDate(date)}
+              />
+              <View style={styles.divider} />
+              <LabelTypo
+                label="Table and Blueprint"
+                fontSize={20}
+                textStyle={styles.headTypo}
+              />
+              <View style={styles.ticketContainer}>
+                {newTicketTable.map((t, index) => (
+                  <ShowTicketGridTableItem key={index} item={t} />
+                ))}
+                <TouchableOpacity
+                  onPress={() => setShowAddTicketTable(true)}
+                  style={[
+                    styles.vuesaxoutlinegalleryExportParent,
+                    {
+                      height: 120,
+                      width: '49%',
+                    },
+                  ]}>
+                  <PLUS_ADD />
+                </TouchableOpacity>
+              </View>
+              <View style={styles.divider} />
+              <LabelTypo
+                label="Create Offer"
+                fontSize={20}
+                textStyle={[styles.headTypo, {marginLeft: 10}]}
+              />
+              <AppInput
+                onChangeText={(v: any) => onChangeInputValue('offer_name', v)}
+                placeholder="20%"
+                label="Offer Name"
+                value={formData?.offer_name}
+              />
+              <View style={styles.divider} />
+              <AppInput
+                onChangeText={(v: any) => onChangeInputValue('offer_code', v)}
+                placeholder="HAPPYFRIDAY"
+                label="Offer Code"
+                value={formData?.offer_code}
+              />
+              <View style={styles.divider} />
+              <LabelTypo
+                label="Terms & Condition"
+                fontSize={20}
+                textStyle={[styles.headTypo, {marginLeft: 10}]}
+              />
+              <View style={styles.divider} />
+              <View style={styles.privacyContainer}>
+                {privacy
+                  .filter(i => i)
+                  .map((i, inx) => {
+                    return (
+                      <Text style={styles.privacyText} key={inx}>
+                        {'\u25CF'} {i}
+                      </Text>
+                    );
+                  })}
+              </View>
+              <View style={styles.divider} />
+              <AppInput
+                placeholder="Type Terms & Condition"
+                value={privacyText}
+                onChangeText={(text: any) => {
+                  setPrivacyText(text);
+                }}
+                extraItem={
+                  <>
+                    <Button
+                      style={[
+                        styles.addAmen,
+                        {
+                          top: 15,
+                        },
+                      ]}
+                      onPress={() => {
+                        setPrivacy(
+                          prev => [...(prev ?? []), privacyText] as string[],
+                        );
+                        setPrivacyText('');
+                        onChangeInputValue('privacy', amenities.join());
+                      }}>
+                      <Text style={styles.addAmenText}>Add</Text>
+                    </Button>
+                  </>
+                }
+              />
+            </View>
 
-              <View style={styles.buttonContianer}>
-                <GradientButton text={`Next`} />
-              </View>
-            </>
+            <View style={styles.buttonContianer}>
+              <GradientButton onPress={addTicket} text={`Publish Event`} />
+            </View>
           </>
         )}
         <View />
@@ -443,6 +672,41 @@ const CreateEvent = () => {
 };
 
 const styles = StyleSheet.create({
+  privacyText: {
+    fontSize: FontSize.size_sm,
+    fontFamily: FontFamily.poppinsRegular,
+    color: Color.gray_200,
+    width: '100%',
+    lineHeight: 19,
+    flexDirection: 'row',
+  },
+  privacyContainer: {
+    width: '90%',
+    flexDirection: 'column',
+  },
+  makePillContainer: {
+    justifyContent: 'flex-start',
+    alignItems: 'flex-start',
+    flexDirection: 'row',
+    display: 'flex',
+    width: '100%',
+  },
+  makePill: {
+    borderWidth: 1,
+    borderColor: Color.gray_200,
+    borderRadius: 10,
+    width: 'auto',
+    padding: 5,
+    paddingBottom: 2,
+    paddingTop: 2,
+    fontSize: FontSize.size_3xs,
+    fontFamily: FontFamily.poppinsRegular,
+  },
+  pricePrint: {
+    fontFamily: FontFamily.poppinsSemibold,
+    fontSize: FontSize.size_xs,
+    color: Color.textWhiteFFFFFF,
+  },
   ticketHeaderContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -455,7 +719,12 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     color: Color.gray_200,
   },
-  dividerLine: {},
+  dividerLine: {
+    width: '100%',
+    height: 1,
+    backgroundColor: Color.gray_200,
+    marginTop: 10,
+  },
   ticketFooter: {
     flexDirection: 'row',
     width: '100%',

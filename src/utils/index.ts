@@ -11,4 +11,5 @@ export type RootStackParamList = {
   Handler: any | undefined;
   AddUser: any | undefined;
   CreateEvent: any | undefined;
+  Home: any | undefined;
 };

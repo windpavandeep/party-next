@@ -6,23 +6,49 @@ import {useState} from 'react';
 import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '@utils/index';
+import moment from 'moment';
+import {renderImage} from '@src/utils/helper';
 
-const EventCard = () => {
-  const [randNum] = useState(Math.floor(Math.random() * 10) + 1);
+const EventCard = ({item}: {item: any}) => {
+  const {navigate} = useNavigation<StackNavigationProp<RootStackParamList>>();
+
   return (
-    <View style={styles.container}>
+    <TouchableOpacity
+      onPress={() => navigate('EventDetails', {id: item.id})}
+      style={styles.container}>
       <Image
         source={{
-          uri: `https://picsum.photos/id/${randNum}/200/300`,
+          uri: renderImage(item?.cover_pic),
         }}
         width={193}
         height={120}
       />
       <View style={styles.detailContainer}>
-        <Text style={styles.gridItemText}>Holi Night</Text>
+        <Text style={styles.gridItemText}>{item?.event_name}</Text>
+        <Text
+          style={[
+            styles.typpeText,
+            {
+              position: 'absolute',
+              right: 10,
+              borderWidth: 0,
+              color: item.statuss ?? 'pubhlish' ? 'green' : 'red',
+              width: 60,
+              fontFamily: FontFamily.poppinsSemibold,
+            },
+          ]}>
+          {(item.statuss ?? '').toUpperCase()}
+        </Text>
         <View style={styles.typeContainer}>
-          <Text style={styles.typpeText}>Music</Text>
-          <View style={styles.avatarContainer}>
+          {(item?.event_type ?? '')
+            .split(',')
+            .filter((i: any) => i)
+            .map((i: any) => (
+              <Text key={i} style={styles.typpeText}>
+                {i}
+              </Text>
+            ))}
+          {/* <View style={styles.avatarContainer}>
             {[1, 2, 4].map((i, index) => (
               <Avatar
                 key={i}
@@ -39,38 +65,62 @@ const EventCard = () => {
               />
             ))}
             <Text style={styles.totalSoldText}>220 Sold</Text>
-          </View>
+          </View> */}
         </View>
         <View style={styles.locationContainer}>
           <LOCATION />
-          <Text style={styles.locationText}>Orilla, Pune</Text>
+          <Text style={styles.locationText}>{item?.location}</Text>
         </View>
-        <Text style={styles.dateText}>20 Dec, 9:00pm</Text>
+        <Text style={styles.dateText}>
+          {moment(item?.event_date).format('DD MMM, HH:mm a')}
+        </Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
-export const LongEventCard = () => {
-  const [randNum] = useState(Math.floor(Math.random() * 10) + 1);
+export const LongEventCard = ({item}: {item: any}) => {
   const {navigate} = useNavigation<StackNavigationProp<RootStackParamList>>();
+
   return (
     <TouchableOpacity
-      onPress={() => navigate('EventDetails')}
+      onPress={() => navigate('EventDetails', {id: item.id})}
       style={styles.itemContainer}>
       <Image
         source={{
-          uri: `https://picsum.photos/id/${randNum}/200/300`,
+          uri: renderImage(item?.cover_pic),
         }}
         width={100}
         height={117}
       />
       <View style={styles.detailContainer}>
-        <Text style={styles.gridItemText}>Holi Night</Text>
+        <Text style={styles.gridItemText}>{item?.event_name}</Text>
+        <Text
+          style={[
+            styles.typpeText,
+            {
+              position: 'absolute',
+              right: 10,
+              borderWidth: 0,
+              color: item.statuss ?? 'pubhlish' ? 'green' : 'red',
+              width: 60,
+              fontFamily: FontFamily.poppinsSemibold,
+            },
+          ]}>
+          {(item.statuss ?? '').toUpperCase()}
+        </Text>
         <View style={styles.typeContainer}>
-          <Text style={styles.typpeText}>Music</Text>
+          {(item?.event_type ?? '')
+            .split(',')
+            .filter((i: any) => i)
+            .map((i: any) => (
+              <Text key={i} style={styles.typpeText}>
+                {i}
+              </Text>
+            ))}
+
           <View style={styles.avatarContainer}>
-            {[1, 2, 4].map((i, index) => (
+            {/* {[1, 2, 4].map((i, index) => (
               <Avatar
                 key={i}
                 source={{
@@ -84,15 +134,17 @@ export const LongEventCard = () => {
                   },
                 ]}
               />
-            ))}
-            <Text style={styles.totalSoldText}>220 Sold</Text>
+            ))} */}
+            <Text style={styles.totalSoldText}>0 Sold</Text>
           </View>
         </View>
         <View style={styles.locationContainer}>
           <LOCATION />
-          <Text style={styles.locationText}>Orilla, Pune</Text>
+          <Text style={styles.locationText}>{item?.location}</Text>
         </View>
-        <Text style={styles.dateText}>20 Dec, 9:00pm</Text>
+        <Text style={styles.dateText}>
+          {moment(item?.event_date).format('DD MMM, HH:mm a')}
+        </Text>
       </View>
     </TouchableOpacity>
   );

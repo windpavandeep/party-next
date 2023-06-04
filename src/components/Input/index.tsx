@@ -181,6 +181,7 @@ export const InputDatePicker = ({
           mode="date"
           placeholder="Choose a Ticket Purchase Deadline"
           label={label}
+          onChange={onChangeText}
         />
       </View>
     </>
@@ -257,9 +258,17 @@ export const GoogleAutoComplete = ({
           {...rest}
         />
 
-        {error && <Text style={[styles.errorText,{
-           bottom: -19,
-        }]}>{error}</Text>}
+        {error && (
+          <Text
+            style={[
+              styles.errorText,
+              {
+                bottom: -19,
+              },
+            ]}>
+            {error}
+          </Text>
+        )}
       </View>
     </>
   );

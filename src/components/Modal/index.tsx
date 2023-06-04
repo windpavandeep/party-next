@@ -66,7 +66,11 @@ const ModalAlert = ({
 
 const AddTicket = ({show, onClose, onConfirm}: Props) => {
   const [buttonType, setButtonType] = useState<string>('couple');
-  const [formData, setFormData] = useState<object>() as any;
+  const [formData, setFormData] = useState<object>({
+    ticketType: 'couple',
+    list: 'guestlist',
+    beforeAfetr: 'before',
+  }) as any;
   const setButtonTypeHandler = (type: string) => {
     setButtonType(type);
   };
@@ -158,8 +162,8 @@ const AddTicket = ({show, onClose, onConfirm}: Props) => {
             />
           </View>
           <RadioGroup
-            style={styles.radioGroup}
-            initialValue={'Guestlist'}
+            style={[styles.radioGroup, {marginTop: 15}]}
+            initialValue={'guestlist'}
             onValueChange={(v: any) => onFormDataSet('list', v)}>
             <RadioButton
               color={Color.crimson}
@@ -262,6 +266,168 @@ const AddTicket = ({show, onClose, onConfirm}: Props) => {
               onPress={() => onConfirm(formData)}
             />
           </View>
+          <TouchableOpacity
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: '100%',
+            }}
+            onPress={onClose}
+            hitSlop={{top: 10, bottom: 10, left: 30, right: 30}}>
+            <Text style={styles.notNow}>Not Now</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </Modal>
+  );
+};
+
+const AddTicketTable = ({show, onClose, onConfirm}: Props) => {
+  const [formData, setFormData] = useState<object>({
+    table_type: 'table_charge',
+    table_style: 'sofa',
+  }) as any;
+
+  const onFormDataSet = (key: string, value: string | any) => {
+    setFormData((p: any) => ({
+      ...p,
+      [key]: value,
+    }));
+  };
+
+  return (
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={show}
+      onRequestClose={() => {
+        onClose();
+      }}>
+      <View style={[styles.centeredView]}>
+        <View
+          style={[
+            styles.modalView,
+            styleAddTicket.modalView,
+            {
+              minHeight: 300,
+            },
+          ]}>
+          <Text
+            style={[
+              styles.title,
+              {
+                textAlign: 'left',
+                width: '100%',
+              },
+            ]}>
+            Add Table
+          </Text>
+
+          <View style={styleAddTicket.inputContainer}>
+            <AppInput
+              inputStyle={styleAddTicket.inputStyle}
+              placeholder="Enter Table Number"
+              placeholderColor={Color.text_black}
+              label=" "
+              onChangeText={(v: any) => onFormDataSet('table_no', v)}
+            />
+          </View>
+          <RadioGroup
+            style={[styles.radioGroup, {marginTop: 20}]}
+            initialValue={'table_charge'}
+            onValueChange={(v: any) => onFormDataSet('table_type', v)}>
+            <RadioButton
+              color={Color.crimson}
+              value={'table_charge'}
+              label={'Table Charge'}
+              labelStyle={{color: Color.gray_100}}
+              size={18}
+            />
+            <View style={styles.divider} />
+            <RadioButton
+              color={Color.crimson}
+              value={'fullcover'}
+              label={'Full Cover'}
+              labelStyle={{color: Color.gray_100}}
+              size={18}
+            />
+            <View style={{flex: 1}} />
+          </RadioGroup>
+          <View
+            style={[
+              styleAddTicket.inputContainer,
+              {
+                flexDirection: 'row',
+                marginTop: 10,
+              },
+            ]}>
+            <AppInput
+              keyboardType="number-pad"
+              inputStyle={styleAddTicket.inputStyle}
+              placeholder="Number of people"
+              placeholderColor={Color.text_black}
+              onChangeText={(v: any) => onFormDataSet('total_no_people', v)}
+            />
+            <View style={styles.divider} />
+            <View style={[styleAddTicket.inputItemContainer, {height: 48}]}>
+              <Picker
+                value={'chair'}
+                placeholder={'Type of table'}
+                onChange={(v: any) => onFormDataSet('table_style', v)}>
+                <Picker.Item key={0} value={'chair'} label={'Sofa'} />
+                <Picker.Item key={1} value={'sofa'} label={'Chair'} />
+              </Picker>
+            </View>
+          </View>
+          <View
+            style={[
+              styleAddTicket.inputContainer,
+              {
+                flexDirection: 'row',
+                marginTop: 0,
+              },
+            ]}>
+            <AppInput
+              inputStyle={styleAddTicket.inputStyle}
+              placeholder="Total Tickets"
+              keyboardType="number-pad"
+              placeholderColor={Color.text_black}
+              onChangeText={(v: any) => onFormDataSet('total_tickets', v)}
+            />
+            <View style={styles.divider} />
+            <AppInput
+              inputStyle={styleAddTicket.inputStyle}
+              placeholder="Price"
+              keyboardType="number-pad"
+              placeholderColor={Color.text_black}
+              onChangeText={(v: any) => onFormDataSet('price', v)}
+            />
+          </View>
+          <View
+            style={[
+              styleAddTicket.inputContainer,
+              {
+                padding: 10,
+                justifyContent: 'center',
+                alignItems: 'center',
+              },
+            ]}>
+            <GradientButton
+              style={{width: '100%'}}
+              text={`Add`}
+              onPress={() => onConfirm(formData)}
+            />
+          </View>
+          <TouchableOpacity
+            style={{
+              justifyContent: 'center',
+              alignItems: 'center',
+              width: '100%',
+            }}
+            onPress={onClose}
+            hitSlop={{top: 10, bottom: 10, left: 30, right: 30}}>
+            <Text style={styles.notNow}>Not Now</Text>
+          </TouchableOpacity>
         </View>
       </View>
     </Modal>
@@ -397,6 +563,6 @@ const styles = StyleSheet.create({
   },
 });
 
-export {AddTicket};
+export {AddTicket, AddTicketTable};
 
 export default ModalAlert;

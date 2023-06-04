@@ -11,14 +11,16 @@ import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '@src/utils';
 import {getUserDetailAsync} from '@src/feature/auth/authApi';
 import {onLogout} from '@src/feature/auth/authSlice';
+import {getALlEventAsync} from '@src/feature/events/eventApi';
 
 const Home = () => {
   const {loading} = useAppSelector(({clubSlice}) => clubSlice) as any;
   const [loader, setLoader] = React.useState<boolean>(false);
   const {user} = useAppSelector(({authUser}) => authUser) as any;
+  const {list} = useAppSelector(({eventSlice}) => eventSlice);
   const {replace} = useNavigation<StackNavigationProp<RootStackParamList>>();
   const dispatch = useAppDispatch();
-
+  const now = Date.now();
   React.useEffect(() => {
     dispatch(getUserDetailAsync(user?.id)).then(res => {
       if (res.meta.requestStatus === 'rejected') {
@@ -31,6 +33,10 @@ const Home = () => {
       }
       if (res.meta.requestStatus === 'fulfilled' && res.payload?.club == null) {
         dispatch(getClubDetailAsync(user?.id)).then(res => {
+          if (res.meta.requestStatus === 'fulfilled') {
+            dispatch(getALlEventAsync(user?.id));
+          }
+
           if (
             res.meta.requestStatus === 'fulfilled' &&
             res.payload?.club == null
@@ -61,24 +67,30 @@ const Home = () => {
             </Text>
           </View>
           <View style={styles.listView}>
-            {/* {[1, 2].map(i => (
-              <LongEventCard key={i} />
-            ))} */}
-            <View
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: 200,
-              }}>
-              <Text
+            {(list ?? [])
+              .filter((i: any) => {
+                return new Date(i?.event_date).getTime() > now;
+              })
+              .map((i, index) => (
+                <LongEventCard item={i} key={index} />
+              ))}
+            {(list ?? []).length <= 0 && (
+              <View
                 style={{
-                  fontSize: FontSize.size_lg,
-                  color: Color.textWhiteFFFFFF,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: 200,
                 }}>
-                No ongoing events
-              </Text>
-            </View>
+                <Text
+                  style={{
+                    fontSize: FontSize.size_lg,
+                    color: Color.textWhiteFFFFFF,
+                  }}>
+                  No ongoing events
+                </Text>
+              </View>
+            )}
           </View>
 
           <View style={styles.tabContainer}>
@@ -88,28 +100,34 @@ const Home = () => {
             </Text>
           </View>
           <View style={styles.cardEventItemContainer}>
-            <View
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: 200,
-              }}>
-              <Text
+            {(list ?? []).length <= 0 && (
+              <View
                 style={{
-                  fontSize: FontSize.size_lg,
-                  color: Color.textWhiteFFFFFF,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: 200,
                 }}>
-                No upcoming events
-              </Text>
-            </View>
+                <Text
+                  style={{
+                    fontSize: FontSize.size_lg,
+                    color: Color.textWhiteFFFFFF,
+                  }}>
+                  No upcoming events
+                </Text>
+              </View>
+            )}
             <ScrollView horizontal>
-              {/* {[1, 2, 3, 4, 5].map(i => (
-                <React.Fragment key={i}>
-                  <EventCard />
-                  <View style={styles.divider} />
-                </React.Fragment>
-              ))} */}
+              {(list ?? [])
+                .filter((i: any) => {
+                  return new Date(i?.event_date).getTime() < now;
+                })
+                .map((i: any, index: number) => (
+                  <React.Fragment key={index}>
+                    <EventCard item={i} />
+                    <View style={styles.divider} />
+                  </React.Fragment>
+                ))}
             </ScrollView>
           </View>
         </>

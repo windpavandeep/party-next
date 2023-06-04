@@ -9,9 +9,11 @@ import {EVENTS} from '@src/assets/icons';
 import {useNavigation} from '@react-navigation/native';
 import {RootStackParamList} from '@src/utils';
 import {StackNavigationProp} from '@react-navigation/stack';
+import {useAppSelector} from '@src/app/hooks';
 
 const Events = () => {
   const {navigate} = useNavigation<StackNavigationProp<RootStackParamList>>();
+  const {list} = useAppSelector(({eventSlice}) => eventSlice);
   const FloatActionButton = () => {
     return (
       <View style={styles.floatBtn}>
@@ -24,6 +26,7 @@ const Events = () => {
       </View>
     );
   };
+  console.log(' === event listed ==> ', list);
   return (
     <>
       <PageContainer extraItems={<FloatActionButton />} useSafeArea={false}>
@@ -45,24 +48,26 @@ const Events = () => {
             />
           </View>
           <View style={styles.listView}>
-            {/* {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(i => (
-              <LongEventCard key={i} />
-            ))} */}
-            <View
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: 200,
-              }}>
-              <Text
+            {(list ?? []).map((i, index) => (
+              <LongEventCard item={i} key={index} />
+            ))}
+            {(list ?? []).length <= 0 && (
+              <View
                 style={{
-                  fontSize: FontSize.size_lg,
-                  color: Color.textWhiteFFFFFF,
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: 200,
                 }}>
-                No events
-              </Text>
-            </View>
+                <Text
+                  style={{
+                    fontSize: FontSize.size_lg,
+                    color: Color.textWhiteFFFFFF,
+                  }}>
+                  No events
+                </Text>
+              </View>
+            )}
           </View>
         </>
       </PageContainer>

@@ -1,6 +1,10 @@
 import {createSlice} from '@reduxjs/toolkit';
 import Toast from 'react-native-toast-message';
-import {createEventAsync, createTicketAsync} from './eventApi';
+import {
+  createEventAsync,
+  createTicketAsync,
+  getALlEventAsync,
+} from './eventApi';
 export interface eventState {
   loading: Boolean;
   event: Object;
@@ -52,6 +56,7 @@ const eventSlice = createSlice({
           loading: false,
         };
       })
+      // Event create
       .addCase(createTicketAsync.pending, state => ({
         ...state,
         loading: true,
@@ -68,6 +73,29 @@ const eventSlice = createSlice({
         };
       })
       .addCase(createTicketAsync.rejected, (state, action) => {
+        const errorRes: any = action.payload;
+        Toast.show({
+          type: 'error',
+          text1: errorRes?.message,
+        });
+        return {
+          ...state,
+          loading: false,
+        };
+      })
+      // Event List
+      .addCase(getALlEventAsync.pending, state => ({
+        ...state,
+        loading: true,
+      }))
+      .addCase(getALlEventAsync.fulfilled, (state, action) => {
+        return {
+          ...state,
+          loading: false,
+          list: action.payload,
+        };
+      })
+      .addCase(getALlEventAsync.rejected, (state, action) => {
         const errorRes: any = action.payload;
         Toast.show({
           type: 'error',
