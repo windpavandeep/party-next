@@ -10,6 +10,8 @@ export type RootStackParamList = {
   PrivateStack: {id: number} | undefined;
   Handler: any | undefined;
   AddUser: any | undefined;
-  CreateEvent: any | undefined;
+  CreateEvent:
+    | {id?: any; tickets?: any; images?: any; eventDetail?: any}
+    | undefined;
   Home: any | undefined;
 };

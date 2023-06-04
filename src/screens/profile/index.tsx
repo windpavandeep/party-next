@@ -83,25 +83,33 @@ const Profile = () => {
               </View>
               <Text style={styles.username}>{user?.name}</Text>
             </View>
-            <View style={[styles.itemContainer, {marginTop: 15}]}>
-              <ProfileRating />
-            </View>
+            {user?.role !== 'handler' && (
+              <View style={[styles.itemContainer, {marginTop: 15}]}>
+                <ProfileRating />
+              </View>
+            )}
             <View style={[styles.itemContainer, {marginTop: 35}]}>
-              <ProfileMenuItem
-                onPress={onEditProfile}
-                Icon={MENU_USER}
-                text="Edit Profile Details"
-              />
-              <ProfileMenuItem
-                onPress={() => navigate('CreateClub', {edit: true})}
-                Icon={MENU_CLUB}
-                text="Edit Club Details"
-              />
-              <ProfileMenuItem
-                Icon={MANAGER}
-                text="Manage Handler"
-                onPress={() => navigate('Handler')}
-              />
+              {user?.role !== 'handler' && (
+                <ProfileMenuItem
+                  onPress={onEditProfile}
+                  Icon={MENU_USER}
+                  text="Edit Profile Details"
+                />
+              )}
+              {user?.role !== 'handler' && (
+                <ProfileMenuItem
+                  onPress={() => navigate('CreateClub', {edit: true})}
+                  Icon={MENU_CLUB}
+                  text="Edit Club Details"
+                />
+              )}
+              {user?.role !== 'handler' && (
+                <ProfileMenuItem
+                  Icon={MANAGER}
+                  text="Manage Handler"
+                  onPress={() => navigate('Handler')}
+                />
+              )}
               <ProfileMenuItem
                 onPress={() => navigate('Settings')}
                 Icon={SETTING}

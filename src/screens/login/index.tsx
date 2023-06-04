@@ -18,6 +18,7 @@ const LoginScreen = () => {
   const {loading} = useAppSelector(({authUser}) => authUser);
   const dispatch = useAppDispatch();
   const onSubmit = (values: {username: string; password: string}) => {
+    console.log(' === submiter ===');
     dispatch(
       userLoginAsync({
         username: values.username,

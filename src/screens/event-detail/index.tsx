@@ -6,7 +6,6 @@ import {
   Text,
   TouchableOpacity,
   View,
-  useWindowDimensions,
 } from 'react-native';
 import PageContainer from '@components/Container';
 import {Avatar, Carousel} from 'react-native-ui-lib';
@@ -16,23 +15,32 @@ import {CALENDOR, OFFER_CODE, ROUNDER_LOCATION, SHARE} from '@assets/icons';
 import TicketType from '@components/TicketType';
 import Divider from '@components/Divider';
 import GradientButton from '@components/Button';
-import {useRoute} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 import {useAppSelector} from '@src/app/hooks';
 import moment from 'moment';
 import {daysInWeek, renderImage} from '@src/utils/helper';
-import {getTicketWithEventId} from '@src/services/event.service';
+import {
+  getImagesEntry,
+  getTicketWithEventId,
+} from '@src/services/event.service';
+import {StackNavigationProp} from '@react-navigation/stack';
+import {RootStackParamList} from '@src/utils';
+import Share from 'react-native-share';
 
 const EventDetails = () => {
+  const {navigate} = useNavigation<StackNavigationProp<RootStackParamList>>();
   const {params} = useRoute() as any;
   const {list} = useAppSelector(({eventSlice}) => eventSlice);
   const {club} = useAppSelector(({clubSlice}) => clubSlice) as any;
+  const {user} = useAppSelector(({authUser}) => authUser) as any;
   const [eventDetail, setEventDetails] = useState<any>({});
   const [ticket, setTickets] = useState<any>([]);
   const [ticketLoading, setTicketLoading] = useState<boolean>(false);
-
+  const [images, setImages] = useState<any>([]);
   const IMAGES = useMemo(() => {
-    return [renderImage(eventDetail?.cover_pic)];
-  }, [eventDetail]);
+    const imageUpdate = images.map((i: any) => renderImage(i?.url));
+    return [renderImage(eventDetail?.cover_pic), ...imageUpdate];
+  }, [eventDetail, images]);
 
   const CarouselRender = useMemo(
     () => (
@@ -90,7 +98,6 @@ const EventDetails = () => {
       setTicketLoading(true);
       try {
         const res = await getTicketWithEventId(eventDetail?.id);
-        console.log(' == list ticket ===> ', res.data);
         setTickets(res.data);
       } catch (error) {
         console.log(' ==== error ===> ', error);
@@ -100,6 +107,41 @@ const EventDetails = () => {
     };
     getTickets();
   }, [eventDetail]);
+
+  useEffect(() => {
+    const getImages = async () => {
+      try {
+        const res = await getImagesEntry(eventDetail?.id);
+        setImages(res.data);
+      } catch (error) {
+        console.log(' ==== error ===> ', error);
+      }
+    };
+    getImages();
+  }, [eventDetail]);
+
+  const onClickEdit = () => {
+    navigate('CreateEvent', {
+      id: eventDetail?.id,
+      tickets: ticket,
+      images: images,
+      eventDetail: eventDetail,
+    });
+  };
+
+  const onShareEvent = () => {
+    const shareOptions = {
+      title: eventDetail?.event_name,
+      message: 'Sharing event details',
+    };
+    Share.open(shareOptions)
+      .then(res => {
+        console.log(res);
+      })
+      .catch(err => {
+        err && console.log(err);
+      });
+  };
 
   return (
     <>
@@ -268,12 +310,29 @@ const EventDetails = () => {
         </>
       </PageContainer>
       <View style={[styles.detailContainer, styles.btnSaveAbs]}>
-        <TouchableOpacity>
-          <SHARE />
-        </TouchableOpacity>
-        <View style={{flex: 1, marginLeft: 15}}>
-          <GradientButton text="Edit Event" style={styles.btnSave} />
-        </View>
+        {user?.role !== 'handler' && (
+          <TouchableOpacity onPress={onShareEvent}>
+            <SHARE />
+          </TouchableOpacity>
+        )}
+
+        {user?.role === 'handler' ? (
+          <View style={{flex: 1}}>
+            <GradientButton
+              onPress={onShareEvent}
+              text="Share"
+              style={[styles.btnSave]}
+            />
+          </View>
+        ) : (
+          <View style={{flex: 1, marginLeft: 15}}>
+            <GradientButton
+              onPress={onClickEdit}
+              text="Edit Event"
+              style={styles.btnSave}
+            />
+          </View>
+        )}
       </View>
     </>
   );

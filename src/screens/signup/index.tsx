@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_xs,
   },
   header: {
-    marginTop: 84,
+    marginTop: 44,
     height: 67,
     width: 295,
   },

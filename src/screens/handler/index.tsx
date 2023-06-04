@@ -13,12 +13,14 @@ import {useAppDispatch, useAppSelector} from '@src/app/hooks';
 import {getClubUsersAsync} from '@src/feature/club/clubApi';
 import {USER_PLACEHOLDER_PNG} from '@src/assets/images';
 import {renderImage} from '@src/utils/helper';
+import {deleteHandlerUser} from '@src/services/auth.service';
 
 interface ListProps {
   item: Object | any;
+  onUserDelete: any;
 }
 
-const UserListItem = ({item}: ListProps) => {
+const UserListItem = ({item, onUserDelete}: ListProps) => {
   return (
     <View style={styles.itemContainer}>
       <Avatar
@@ -37,6 +39,7 @@ const UserListItem = ({item}: ListProps) => {
         <Text style={styles.textSmall}>{item.email}</Text>
       </View>
       <TouchableOpacity
+        onPress={() => onUserDelete(item?.id)}
         hitSlop={{top: 10, bottom: 10, left: 10, right: 10}}
         style={styles.trash}>
         <TRASH />
@@ -46,13 +49,12 @@ const UserListItem = ({item}: ListProps) => {
 };
 
 const Handler = () => {
-  const {club, users, loading} = useAppSelector(
-    ({clubSlice}) => clubSlice,
-  ) as any;
+  const {users, loading} = useAppSelector(({clubSlice}) => clubSlice) as any;
+  const {user} = useAppSelector(({authUser}) => authUser) as any;
   const {navigate} = useNavigation<StackNavigationProp<RootStackParamList>>();
   const dispatch = useAppDispatch();
   React.useEffect(() => {
-    dispatch(getClubUsersAsync(club?.club?.id));
+    dispatch(getClubUsersAsync(user?.id));
   }, []);
 
   const FloatActionButton = () => {
@@ -68,6 +70,16 @@ const Handler = () => {
     );
   };
 
+  const onDeleteUser = async (userId: number) => {
+    try {
+      const del = await deleteHandlerUser(userId);
+      console.log(' === del ===res ===> ', del);
+      dispatch(getClubUsersAsync(user?.id));
+    } catch (error) {
+      console.log(' === Error ===> ', error);
+    }
+  };
+
   return (
     <>
       <PageContainer
@@ -77,8 +89,29 @@ const Handler = () => {
         <>
           <View style={styles.listView}>
             {(users?.users ?? []).map((i: any, index: any) => (
-              <UserListItem key={index} item={i} />
+              <UserListItem
+                onUserDelete={(id: any) => onDeleteUser(id)}
+                key={index}
+                item={i}
+              />
             ))}
+            {(users?.users ?? []).length <= 0 && (
+              <View
+                style={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: 200,
+                }}>
+                <Text
+                  style={{
+                    fontSize: FontSize.size_lg,
+                    color: Color.textWhiteFFFFFF,
+                  }}>
+                  No user
+                </Text>
+              </View>
+            )}
           </View>
         </>
       </PageContainer>

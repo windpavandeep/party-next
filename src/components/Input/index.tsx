@@ -135,11 +135,13 @@ export const InputTimePicker = ({
       <View style={styles.container}>
         <View style={[styles.groupChild, styles.groupChildLayout, inputStyle]}>
           <DateTimePicker
-            value={new Date()}
+            value={value}
             mode="time"
             style={{
               color: Color.textWhiteFFFFFF,
             }}
+            onChange={onChangeText}
+            timeFormat="HH:MM A"
           />
         </View>
       </View>
@@ -182,6 +184,7 @@ export const InputDatePicker = ({
           placeholder="Choose a Ticket Purchase Deadline"
           label={label}
           onChange={onChangeText}
+          value={new Date(value)}
         />
       </View>
     </>

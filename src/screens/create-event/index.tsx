@@ -34,12 +34,17 @@ import {
   createTicketAsync,
 } from '@src/feature/events/eventApi';
 import * as ImagePicker from 'react-native-image-picker';
-import {bannerChange} from '@src/services/event.service';
-import {createFormData} from '@src/utils/helper';
+import {
+  addEventTicket,
+  addImageGallary,
+  addImagesEntry,
+  bannerChange,
+} from '@src/services/event.service';
+import {createFormData, renderImage} from '@src/utils/helper';
 import Toast from 'react-native-toast-message';
 import {RootStackParamList} from '@src/utils';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation, useRoute} from '@react-navigation/native';
 
 const ShowTicketGridItem = ({
   item,
@@ -128,6 +133,7 @@ const ShowTicketGridTableItem = ({item}: {item: any}) => {
 };
 
 const CreateEvent = () => {
+  const {params} = useRoute() as any;
   const [bannerImage, setBannerImage] = React.useState<any>(null);
   const [gallary, setGallary] = React.useState<any>(null);
   const [showAddTicket, setShowAddTicket] = React.useState<boolean>(false);
@@ -148,6 +154,64 @@ const CreateEvent = () => {
   const {width} = useWindowDimensions();
   const {navigate} = useNavigation<StackNavigationProp<RootStackParamList>>();
 
+  React.useEffect(() => {
+    let imgs = {};
+    (params?.images ?? []).forEach((im: any, index: any) => {
+      imgs = {
+        ...imgs,
+        [index]: {
+          uri: renderImage(im?.url),
+        },
+      };
+    });
+    setGallary(imgs);
+    setNewTicket(
+      (params?.tickets ?? [])
+        .filter((i: any) => i?.type === 'ticket')
+        .map((i: any) => ({
+          beforeAfetr: i?.beforeafter,
+          list: i?.visit_type,
+          name: i?.name,
+          price: i?.price,
+          ticketType: i?.ticket_type,
+          time: i?.ticket_time,
+          timeonoff: i?.onoff,
+          total_tickets: i?.total_ticket,
+          event_id: event?.id,
+          id: i?.id,
+        })),
+    );
+    setNewTicketTable(
+      (params?.tickets ?? [])
+        .filter((i: any) => i?.type === 'table')
+        .map((i: any) => ({
+          table_no: i?.name,
+          total_tickets: i?.total_ticket,
+          total_no_people: i?.no_of_people,
+          table_style: i?.table_type,
+          price: i?.price,
+          table_type: i?.visit_type,
+          event_id: i?.event_id,
+          id: i?.id,
+        })),
+    );
+    setFormData({
+      ...params?.eventDetail,
+      event_type: (params?.eventDetail?.event_type ?? '').split(),
+    });
+    setLastBookingDate(params?.eventDetail?.last_booking_date);
+    setPrivacy((params?.eventDetail?.terms ?? '').split(','));
+    setAmenities((params?.eventDetail?.amenities ?? '').split(','));
+    setBannerImage({
+      assets: [
+        {
+          uri: renderImage(params?.eventDetail?.cover_pic),
+        },
+      ],
+    });
+  }, []);
+
+  console.log(' ==== FormDatab ====> ', params?.tickets);
   const onChangeInputValue = (key: any, value: any) => {
     setFormData((p: any) => ({
       ...p,
@@ -190,6 +254,9 @@ const CreateEvent = () => {
             onoff: i?.timeonoff,
             total_ticket: i?.total_tickets,
             event_id: event?.id,
+            ...(i?.id && {
+              id: i?.id,
+            }),
           })),
         }),
         ...(newTicketTable.length > 0 && {
@@ -202,6 +269,9 @@ const CreateEvent = () => {
             price: i?.price,
             visit_type: i?.table_type,
             event_id: event?.id,
+            ...(i?.id && {
+              id: i?.id,
+            }),
           })),
         }),
         event_id: event?.id,
@@ -243,14 +313,13 @@ const CreateEvent = () => {
       const ext: any = (res?.assets?.[0]?.fileName ?? '').split('.').pop();
       const imageName = `${event?.id}-banner.${ext}`;
 
-      dispatch(
-        createTicketAsync({
-          event_id: event?.id,
-          updatedKeys: {
-            cover_pic: imageName,
-          },
-        }),
-      ).then(() => {});
+      const update = await addEventTicket({
+        event_id: event?.id || formData?.id,
+        updatedKeys: {
+          cover_pic: imageName,
+        },
+      });
+      console.log(' === update ====> ', update);
     } catch (error) {
       console.log(' == error ===> ', error);
     }
@@ -264,8 +333,23 @@ const CreateEvent = () => {
       });
       setGallary((p: any) => ({
         ...p,
-        [index]: res,
+        [index]: res?.assets?.[0],
       }));
+
+      await addImageGallary(
+        createFormData('image', res?.assets?.[0], {}),
+        event?.id,
+        index,
+      );
+      const ext: any = (res?.assets?.[0]?.fileName ?? '').split('.').pop();
+      const imageName = `${event?.id}-${index}-gallary.${ext}`;
+
+      await addImagesEntry([
+        {
+          url: imageName,
+          event_id: event?.id,
+        },
+      ]);
     } catch (error: any) {
       console.log(' == error ===> ', error, error?.response);
     }
@@ -389,14 +473,16 @@ const CreateEvent = () => {
               <View style={styles.timeContainer}>
                 <InputTimePicker
                   placeholder="Start Time"
-                  mode="MULTI"
                   inputStyle={{
                     width: '100%',
                     paddingTop: 15,
                     paddingLeft: 10,
                     color: Color.textWhiteFFFFFF,
                   }}
-                  onChangeText={(v: any) => onChangeInputValue('start_time', v)}
+                  onChangeText={(v: any) => {
+                    console.log(' === datae ====> ', v);
+                    onChangeInputValue('start_time', v);
+                  }}
                   value={formData?.start_time}
                 />
                 <View style={styles.divider} />
@@ -516,7 +602,8 @@ const CreateEvent = () => {
                     paddingRight: 0,
                   },
                 ]}>
-                {[1, 2, 3, 4, 5, 6].map(index => {
+                {[0, 1, 2, 3, 4, 5].map(index => {
+                  console.log(' == gallary ===> ', gallary?.[index]);
                   return (
                     <TouchableOpacity
                       key={index}
@@ -528,7 +615,7 @@ const CreateEvent = () => {
                       {gallary?.[index] ? (
                         <Image
                           source={{
-                            uri: gallary?.[index]?.assets?.[0].uri,
+                            uri: gallary?.[index].uri,
                           }}
                           style={{
                             width: '99.%',
@@ -570,6 +657,7 @@ const CreateEvent = () => {
                   color: Color.textWhiteFFFFFF,
                 }}
                 onChangeText={(date: any) => setLastBookingDate(date)}
+                value={last_booking_date}
               />
               <View style={styles.divider} />
               <LabelTypo

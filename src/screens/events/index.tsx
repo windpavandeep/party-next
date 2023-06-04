@@ -14,6 +14,7 @@ import {useAppSelector} from '@src/app/hooks';
 const Events = () => {
   const {navigate} = useNavigation<StackNavigationProp<RootStackParamList>>();
   const {list} = useAppSelector(({eventSlice}) => eventSlice);
+  const {user} = useAppSelector(({authUser}) => authUser) as any;
   const FloatActionButton = () => {
     return (
       <View style={styles.floatBtn}>
@@ -26,10 +27,11 @@ const Events = () => {
       </View>
     );
   };
-  console.log(' === event listed ==> ', list);
   return (
     <>
-      <PageContainer extraItems={<FloatActionButton />} useSafeArea={false}>
+      <PageContainer
+        extraItems={user?.role !== 'handler' && <FloatActionButton />}
+        useSafeArea={false}>
         <>
           <View style={styles.calContianer}>
             <Calendar

@@ -37,7 +37,7 @@ const eventSlice = createSlice({
       .addCase(createEventAsync.fulfilled, (state, action) => {
         Toast.show({
           type: 'success',
-          text1: 'Event Saved as draft.',
+          text1: 'Successfully Saved.',
         });
         return {
           ...state,

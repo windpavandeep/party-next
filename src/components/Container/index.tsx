@@ -1,5 +1,11 @@
 import React, {Fragment} from 'react';
-import {ActivityIndicator, ScrollView, StyleSheet, View} from 'react-native';
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  ScrollView,
+  StyleSheet,
+  View,
+} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {Color} from '@utils/GlobalStyles';
 import {LoaderScreen} from 'react-native-ui-lib';
@@ -22,7 +28,7 @@ const PageContainer = ({
   extraItems,
 }: Props) => {
   const Element = useSafeArea ? SafeAreaView : View;
-  const LoaderElement: any = loading ? LoaderScreen : Fragment;
+  const LoaderElement: any = loading ? LoaderScreen : KeyboardAvoidingView;
   return (
     <>
       <Element
@@ -38,7 +44,8 @@ const PageContainer = ({
               <ActivityIndicator size={'large'} color={Color.crimson} />
             ),
             message: 'Loading...',
-          })}>
+          })}
+          behavior="padding">
           <ScrollView
             showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.ScrollView}>

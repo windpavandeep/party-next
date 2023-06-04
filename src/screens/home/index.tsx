@@ -32,21 +32,37 @@ const Home = () => {
         }, 1000);
       }
       if (res.meta.requestStatus === 'fulfilled' && res.payload?.club == null) {
-        dispatch(getClubDetailAsync(user?.id)).then(res => {
-          if (res.meta.requestStatus === 'fulfilled') {
-            dispatch(getALlEventAsync(user?.id));
-          }
-
-          if (
-            res.meta.requestStatus === 'fulfilled' &&
-            res.payload?.club == null
-          ) {
-            replace('CreateClub');
-          }
-        });
+        if (user?.role === 'handler') {
+          // Club is Is used as owner userId
+          dispatch(getClubDetailAsync(user?.club_id)).then(res => {
+            if (res.meta.requestStatus === 'fulfilled') {
+              dispatch(getALlEventAsync(user?.club_id)); // Club is Is used as owner userId
+            }
+            if (
+              res.meta.requestStatus === 'fulfilled' &&
+              res.payload?.club == null
+            ) {
+              replace('CreateClub');
+            }
+          });
+        } else {
+          dispatch(getClubDetailAsync(user?.id)).then(res => {
+            if (res.meta.requestStatus === 'fulfilled') {
+              dispatch(getALlEventAsync(user?.id));
+            }
+            if (
+              res.meta.requestStatus === 'fulfilled' &&
+              res.payload?.club == null
+            ) {
+              replace('CreateClub');
+            }
+          });
+        }
       }
     });
   }, []);
+
+  console.log(' === res ==> ', user);
 
   return (
     <>

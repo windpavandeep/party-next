@@ -6,6 +6,7 @@ const PATHS = {
   signup: 'users/signup',
   login: 'login',
   imageUpdate: 'users/change-profile',
+  deleteHandler: 'users/delete-handler/',
 };
 
 export const userLogin = (payload: LoginPayloadTypes) =>
@@ -13,6 +14,9 @@ export const userLogin = (payload: LoginPayloadTypes) =>
 
 export const userSignup = (payload: SignupPayloadTypes) =>
   axiosApi.post(PATHS.signup, payload);
+
+export const deleteHandlerUser = (userId: number) =>
+  axiosApi.delete(`${PATHS.deleteHandler}${userId}`);
 
 export const getUserDetail = (id: number) =>
   axiosApi.get(`${PATHS.users}/${id}`);

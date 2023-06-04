@@ -64,9 +64,10 @@ const authSlice = createSlice({
       })
       .addCase(userLoginAsync.rejected, (state, action) => {
         const errorRes: any = action.payload;
+        console.log(' === response ===> ', action.payload);
         Toast.show({
           type: 'error',
-          text1: errorRes?.message,
+          text1: errorRes?.message || errorRes?.error,
         });
         return {
           ...state,

@@ -7,7 +7,7 @@ import {useNavigation} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import {RootStackParamList} from '@utils/index';
 import ModalAlert from 'src/components/Modal';
-import {useAppDispatch} from '@src/app/hooks';
+import {useAppDispatch, useAppSelector} from '@src/app/hooks';
 import {onLogout} from '@src/feature/auth/authSlice';
 
 const Settings = () => {
@@ -16,6 +16,7 @@ const Settings = () => {
   const [loading, setLoading] = React.useState(false);
   const [showDeleteModal, setShowDeleteModal] = React.useState(false);
   const [showLogoutModal, setShowLogoutModal] = React.useState(false);
+  const {user} = useAppSelector(({authUser}) => authUser) as any;
   const dispatch = useAppDispatch();
   const onLogOutHandler = () => {
     setLoading(true);
@@ -50,12 +51,12 @@ const Settings = () => {
             showArrow: true,
           },
           {
-            title: 'Change Password',
+            title: user?.role !== 'handler' ? 'Change Password' : undefined,
             showArrow: true,
             onPress: () => navigate('ChangePassword'),
           },
           {
-            title: 'Delete account',
+            title: user?.role !== 'handler' ? 'Delete account' : undefined,
             showArrow: false,
             onPress: () => {
               setShowDeleteModal(true);
@@ -68,20 +69,22 @@ const Settings = () => {
               setShowLogoutModal(true);
             },
           },
-        ].map((item, index) => {
-          return (
-            <View key={index}>
-              <TouchableOpacity
-                onPress={item?.onPress}
-                style={styles.itemContainer}
-                key={index}>
-                <Text style={styles.itemText}>{item.title}</Text>
-                {item.showArrow && <ARROW_RIGHT />}
-              </TouchableOpacity>
-              <View style={styles.divider} />
-            </View>
-          );
-        })}
+        ]
+          .filter(i => i?.title)
+          .map((item, index) => {
+            return (
+              <View key={index}>
+                <TouchableOpacity
+                  onPress={item?.onPress}
+                  style={styles.itemContainer}
+                  key={index}>
+                  <Text style={styles.itemText}>{item.title}</Text>
+                  {item.showArrow && <ARROW_RIGHT />}
+                </TouchableOpacity>
+                <View style={styles.divider} />
+              </View>
+            );
+          })}
       </>
     </PageContainer>
   );
